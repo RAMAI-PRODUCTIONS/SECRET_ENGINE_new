@@ -30,7 +30,8 @@ public:
     void DestroyMaterial(SecretEngine::MaterialHandle handle) override;
     const SecretEngine::MaterialProperties* GetMaterial(SecretEngine::MaterialHandle handle) const override;
     SecretEngine::MaterialHandle GetMaterialByName(const char* name) const override;
-    const void* GetMaterialBuffer() const override;
+    std::span<const SecretEngine::MaterialProperties> GetMaterialBuffer() const override;
+    const void* GetMaterialBufferRaw() const override;
     size_t GetMaterialBufferSize() const override;
     uint32_t GetMaterialCount() const override;
     

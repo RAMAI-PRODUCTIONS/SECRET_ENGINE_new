@@ -12,6 +12,7 @@
 #include "../../CameraPlugin/src/CameraPlugin.h"
 #include "../../AndroidInput/src/InputPlugin.h"
 #include "../../AndroidInput/src/UIConfig.h"
+#include "../../DebugPlugin/src/Profiler.h"
 #include <vector>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -404,6 +405,13 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
     // SUCCESS!
     m_core->SetRendererReady(true);
     
+    // Initialize GPU timing
+    if (!CreateTimestampQueries()) {
+        logger->LogWarning("VulkanRenderer", "GPU timestamp queries not available - GPU timing will be 0");
+    } else {
+        logger->LogInfo("VulkanRenderer", "✓ GPU timestamp queries enabled");
+    }
+    
     logger->LogInfo("VulkanRenderer", "========================================");
     logger->LogInfo("VulkanRenderer", "Vulkan Renderer FULLY INITIALIZED");
     logger->LogInfo("VulkanRenderer", "Ready to render 3D + 2D!");
@@ -448,6 +456,12 @@ void RendererPlugin::OnDeactivate() {
 
 void RendererPlugin::OnUnload() {
     if(m_core && m_core->GetLogger()) m_core->GetLogger()->LogInfo("VulkanRenderer", "Unloading plugin...");
+    
+    // Cleanup GPU timing
+    if (m_queryPool && m_device) {
+        vkDestroyQueryPool(m_device->GetDevice(), m_queryPool, nullptr);
+        m_queryPool = VK_NULL_HANDLE;
+    }
     
     if (m_device) {
         vkDeviceWaitIdle(m_device->GetDevice());
@@ -530,8 +544,8 @@ void RendererPlugin::GetCameraMatrix(float* outViewProj) {
     // Get view-projection from camera (needs interface method)
     // For now, use direct access via void* interface
     auto* cameraPlugin = static_cast<SecretEngine::CameraPlugin*>(camera);
-    const float* vp = cameraPlugin->GetViewProjection();
-    memcpy(outViewProj, vp, 16*sizeof(float));
+    auto vp = cameraPlugin->GetViewProjection();
+    memcpy(outViewProj, vp.data(), 16*sizeof(float));
 }
 
 void RendererPlugin::Submit() {
@@ -587,7 +601,8 @@ void RendererPlugin::Present() {
 
     // Acquire image first, then wait on fence (reduces latency)
     uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(m_device->GetDevice(), m_swapchain->GetSwapchain(), UINT64_MAX, m_imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    // Use 16ms timeout (60 FPS) instead of infinite wait to avoid long blocks
+    VkResult result = vkAcquireNextImageKHR(m_device->GetDevice(), m_swapchain->GetSwapchain(), 16666666, m_imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
     
     vkWaitForFences(m_device->GetDevice(), 1, &m_inFlightFence, VK_TRUE, UINT64_MAX);
 
@@ -619,6 +634,9 @@ void RendererPlugin::Present() {
     VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
     vkBeginCommandBuffer(m_commandBuffer, &beginInfo);
+    
+    // Record GPU start timestamp
+    RecordGPUTimestamps(m_commandBuffer);
     
     // OPTIMIZATION: Shadow Pass (before main render pass)
     RenderShadowPass(m_commandBuffer);
@@ -695,7 +713,7 @@ void RendererPlugin::Present() {
         auto* camera = m_core->GetCapability("camera");
         if (camera) {
             auto* cameraPlugin = static_cast<SecretEngine::CameraPlugin*>(camera);
-            const float* p = cameraPlugin->GetPosition();
+            auto p = cameraPlugin->GetPosition();
             camPos[0] = p[0]; camPos[1] = p[1]; camPos[2] = p[2];
             camRot[0] = cameraPlugin->GetPitch();
             camRot[1] = cameraPlugin->GetYaw();
@@ -713,6 +731,12 @@ void RendererPlugin::Present() {
     DrawWelcomeText(m_commandBuffer);
     
     vkCmdEndRenderPass(m_commandBuffer);
+    
+    // Write GPU end timestamp
+    if (m_timestampsSupported && m_queryPool) {
+        vkCmdWriteTimestamp(m_commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, m_queryPool, 1);
+    }
+    
     vkEndCommandBuffer(m_commandBuffer);
 
     VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
@@ -733,6 +757,9 @@ void RendererPlugin::Present() {
             m_core->GetLogger()->LogError("VulkanRenderer", "Failed to submit draw command buffer!");
         }
     }
+    
+    // Read GPU timestamps from previous frame (after fence wait)
+    ReadGPUTimestamps();
 
     VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
     presentInfo.waitSemaphoreCount = 1;
@@ -923,7 +950,8 @@ bool RendererPlugin::Create2DVertexBuffer() {
                              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                              m_2dVertexBuffer, m_2dVertexMemory)) return false;
 
-    Helpers::MapAndCopy(m_device->GetDevice(), m_2dVertexMemory, bufferSize, vertices.data());
+    std::span<const std::byte> vertexSpan(reinterpret_cast<const std::byte*>(vertices.data()), bufferSize);
+    Helpers::MapAndCopy(m_device->GetDevice(), m_2dVertexMemory, vertexSpan);
     
     return true;
 }
@@ -1315,13 +1343,13 @@ bool RendererPlugin::CreatePluginBuffers() {
 void RendererPlugin::UpdateLightBuffer() {
     if (!m_lightingSystem || !m_lightBuffer) return;
     
-    const void* lightData = m_lightingSystem->GetLightBuffer();
-    size_t lightDataSize = m_lightingSystem->GetLightBufferSize();
+    // C++26: Use std::span for type-safe buffer access
+    auto lightData = m_lightingSystem->GetLightBuffer();
     
-    if (lightData && lightDataSize > 0) {
+    if (!lightData.empty()) {
         void* mapped;
-        vkMapMemory(m_device->GetDevice(), m_lightMemory, 0, lightDataSize, 0, &mapped);
-        memcpy(mapped, lightData, lightDataSize);
+        vkMapMemory(m_device->GetDevice(), m_lightMemory, 0, lightData.size_bytes(), 0, &mapped);
+        memcpy(mapped, lightData.data(), lightData.size_bytes());
         vkUnmapMemory(m_device->GetDevice(), m_lightMemory);
     }
 }
@@ -1329,13 +1357,13 @@ void RendererPlugin::UpdateLightBuffer() {
 void RendererPlugin::UpdateMaterialBuffer() {
     if (!m_materialSystem || !m_materialBuffer) return;
     
-    const void* materialData = m_materialSystem->GetMaterialBuffer();
-    size_t materialDataSize = m_materialSystem->GetMaterialBufferSize();
+    // C++26: Use std::span for type-safe buffer access
+    auto materialData = m_materialSystem->GetMaterialBuffer();
     
-    if (materialData && materialDataSize > 0) {
+    if (!materialData.empty()) {
         void* mapped;
-        vkMapMemory(m_device->GetDevice(), m_materialMemory, 0, materialDataSize, 0, &mapped);
-        memcpy(mapped, materialData, materialDataSize);
+        vkMapMemory(m_device->GetDevice(), m_materialMemory, 0, materialData.size_bytes(), 0, &mapped);
+        memcpy(mapped, materialData.data(), materialData.size_bytes());
         vkUnmapMemory(m_device->GetDevice(), m_materialMemory);
     }
 }
@@ -1373,3 +1401,77 @@ void RendererPlugin::DispatchVolumetricLighting(VkCommandBuffer cmd) {
     // vkCmdDispatch(cmd, workGroupsX, workGroupsY, workGroupsZ);
 }
 
+
+
+// ============================================================================
+// GPU TIMING WITH VULKAN TIMESTAMPS
+// ============================================================================
+
+bool RendererPlugin::CreateTimestampQueries() {
+    if (!m_device) return false;
+    
+    // Check if timestamps are supported
+    VkPhysicalDeviceProperties props;
+    vkGetPhysicalDeviceProperties(m_device->GetPhysicalDevice(), &props);
+    
+    if (props.limits.timestampComputeAndGraphics == VK_FALSE) {
+        m_timestampsSupported = false;
+        return false;
+    }
+    
+    m_timestampPeriod = props.limits.timestampPeriod;
+    m_timestampsSupported = true;
+    
+    // Create query pool for 2 timestamps (start and end)
+    VkQueryPoolCreateInfo poolInfo = { VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO };
+    poolInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
+    poolInfo.queryCount = 2;
+    
+    if (vkCreateQueryPool(m_device->GetDevice(), &poolInfo, nullptr, &m_queryPool) != VK_SUCCESS) {
+        m_timestampsSupported = false;
+        return false;
+    }
+    
+    return true;
+}
+
+void RendererPlugin::RecordGPUTimestamps(VkCommandBuffer cmd) {
+    if (!m_timestampsSupported || !m_queryPool) return;
+    
+    // Reset queries at the start of the command buffer
+    vkCmdResetQueryPool(cmd, m_queryPool, 0, 2);
+    
+    // Write start timestamp
+    vkCmdWriteTimestamp(cmd, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, m_queryPool, 0);
+}
+
+void RendererPlugin::ReadGPUTimestamps() {
+    if (!m_timestampsSupported || !m_queryPool) {
+        // Set GPU time to 0 if not supported
+        auto& profiler = SecretEngine::Profiler::Instance();
+        profiler.GetStats().gpu_frame_time.store(0.0f, std::memory_order_relaxed);
+        return;
+    }
+    
+    // Read timestamp results
+    uint64_t timestamps[2] = {0, 0};
+    VkResult result = vkGetQueryPoolResults(
+        m_device->GetDevice(),
+        m_queryPool,
+        0, 2,
+        sizeof(timestamps),
+        timestamps,
+        sizeof(uint64_t),
+        VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT
+    );
+    
+    if (result == VK_SUCCESS && timestamps[1] > timestamps[0]) {
+        // Calculate GPU time in milliseconds
+        uint64_t delta = timestamps[1] - timestamps[0];
+        float gpuTimeMs = (delta * m_timestampPeriod) / 1000000.0f;
+        
+        // Update profiler stats
+        auto& profiler = SecretEngine::Profiler::Instance();
+        profiler.GetStats().gpu_frame_time.store(gpuTimeMs, std::memory_order_relaxed);
+    }
+}

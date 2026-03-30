@@ -479,7 +479,8 @@ bool MegaGeometryRenderer::LoadMesh(const char* path, uint32_t meshSlot) {
     
     // Stage 1: Load Header (Optimized)
     MeshHeader header = {};
-    if (!m_core->GetAssetProvider()->LoadBinaryToBuffer(path, &header, sizeof(MeshHeader))) {
+    std::span<std::byte> headerSpan(reinterpret_cast<std::byte*>(&header), sizeof(MeshHeader));
+    if (!m_core->GetAssetProvider()->LoadBinaryToBuffer(path, headerSpan)) {
         if (logger) {
             char msg[256];
             snprintf(msg, sizeof(msg), "LoadMesh: Failed to load header for %s", path);

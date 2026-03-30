@@ -86,7 +86,11 @@ SecretEngine::MaterialHandle MaterialPlugin::GetMaterialByName(const char* name)
     return {0, 0};
 }
 
-const void* MaterialPlugin::GetMaterialBuffer() const {
+std::span<const SecretEngine::MaterialProperties> MaterialPlugin::GetMaterialBuffer() const {
+    return std::span<const SecretEngine::MaterialProperties>(m_materials.data(), m_materials.size());
+}
+
+const void* MaterialPlugin::GetMaterialBufferRaw() const {
     return m_materials.empty() ? nullptr : m_materials.data();
 }
 

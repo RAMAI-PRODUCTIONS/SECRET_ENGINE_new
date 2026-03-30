@@ -144,7 +144,8 @@ uint32_t TextureManager::LoadTexture(const char* path, ASTCFormat preferredForma
     // For now, just use a single mip level to avoid std::log2/std::floor portability issues.
     uint32_t mipLevels = 1;
     
-    uint32_t textureID = CreateTextureFromMemory(compressedData.data(), width, height, vkFormat, mipLevels);
+    std::span<const std::byte> dataSpan(reinterpret_cast<const std::byte*>(compressedData.data()), compressedData.size());
+    uint32_t textureID = CreateTextureFromMemory(dataSpan, width, height, vkFormat, mipLevels);
     
     if (textureID != UINT32_MAX) {
         m_textureCache[path] = textureID;
@@ -189,7 +190,7 @@ bool TextureManager::LoadPNGToASTC(const char* path, std::vector<uint8_t>& outDa
     return true;
 }
 
-uint32_t TextureManager::CreateTextureFromMemory(const void* data, uint32_t width, uint32_t height, 
+uint32_t TextureManager::CreateTextureFromMemory(std::span<const std::byte> data, uint32_t width, uint32_t height, 
                                                  VkFormat format, uint32_t mipLevels) {
     if (m_textures.size() >= MAX_TEXTURES) {
         return UINT32_MAX;
@@ -310,17 +311,17 @@ bool TextureManager::CreateSampler(VkSampler& sampler, uint32_t mipLevels) {
     return vkCreateSampler(m_vkDevice, &samplerInfo, nullptr, &sampler) == VK_SUCCESS;
 }
 
-bool TextureManager::UploadTextureData(VkImage image, const void* data, uint32_t width, uint32_t height, 
+bool TextureManager::UploadTextureData(VkImage image, std::span<const std::byte> data, uint32_t width, uint32_t height, 
                                        VkFormat format, uint32_t mipLevels) {
     // Calculate data size
-    size_t dataSize = width * height * 4;  // Assume 4 bytes per pixel for now
+    size_t dataSize = data.size_bytes();
     
     if (dataSize > STAGING_SIZE) {
         return false;  // Texture too large for staging buffer
     }
     
     // Copy to staging
-    memcpy(m_stagingMapped, data, dataSize);
+    memcpy(m_stagingMapped, data.data(), dataSize);
     
     // Create command buffer
     VkCommandBufferAllocateInfo allocInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};

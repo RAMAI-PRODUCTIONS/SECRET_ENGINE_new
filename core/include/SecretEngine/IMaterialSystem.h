@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
+#include <SecretEngine/CPP26Features.h>
 
 namespace SecretEngine {
 
@@ -32,7 +33,11 @@ public:
     virtual const MaterialProperties* GetMaterial(MaterialHandle handle) const = 0;
     virtual MaterialHandle GetMaterialByName(const char* name) const = 0;
     
-    virtual const void* GetMaterialBuffer() const = 0;
+    // C++26: Type-safe buffer access with std::span
+    virtual std::span<const MaterialProperties> GetMaterialBuffer() const = 0;
+    
+    // Legacy API (deprecated, use GetMaterialBuffer() instead)
+    virtual const void* GetMaterialBufferRaw() const = 0;
     virtual size_t GetMaterialBufferSize() const = 0;
     virtual uint32_t GetMaterialCount() const = 0;
 };

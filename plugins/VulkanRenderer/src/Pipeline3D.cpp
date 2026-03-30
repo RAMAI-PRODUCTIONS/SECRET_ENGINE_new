@@ -59,13 +59,15 @@ bool Pipeline3D::LoadMesh(const char* filename) {
     Helpers::CreateBuffer(m_device->GetDevice(), m_device->GetPhysicalDevice(), vertexBufferSize,
                          VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                          mesh.vertexBuffer, mesh.vertexMemory);
-    Helpers::MapAndCopy(m_device->GetDevice(), mesh.vertexMemory, vertexBufferSize, vertices);
+    std::span<const std::byte> vertexSpan(reinterpret_cast<const std::byte*>(vertices), vertexBufferSize);
+    Helpers::MapAndCopy(m_device->GetDevice(), mesh.vertexMemory, vertexSpan);
 
     VkDeviceSize indexBufferSize = mesh.indexCount * sizeof(uint32_t);
     Helpers::CreateBuffer(m_device->GetDevice(), m_device->GetPhysicalDevice(), indexBufferSize,
                          VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                          mesh.indexBuffer, mesh.indexMemory);
-    Helpers::MapAndCopy(m_device->GetDevice(), mesh.indexMemory, indexBufferSize, indices);
+    std::span<const std::byte> indexSpan(reinterpret_cast<const std::byte*>(indices), indexBufferSize);
+    Helpers::MapAndCopy(m_device->GetDevice(), mesh.indexMemory, indexSpan);
 
     m_meshes[filename] = mesh;
     m_core->GetLogger()->LogInfo("Pipeline3D", (std::string("Loaded mesh resource: ") + filename).c_str());

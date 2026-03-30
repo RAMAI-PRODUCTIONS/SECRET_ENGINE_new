@@ -46,13 +46,6 @@ layout(push_constant) uniform CameraData {
     mat4 viewProj;
 } camera;
 
-// ============================================================================
-// LIGHTING CONSTANTS
-// ============================================================================
-const vec3 LIGHT_DIR = vec3(0.57735027, 0.57735027, 0.57735027);
-const float AMBIENT = 0.3;
-const float DIFFUSE_SCALE = 0.7;
-
 void main() {
     // Fetch instance data
     InstanceData instance = instances[gl_InstanceIndex];
@@ -68,7 +61,7 @@ void main() {
     
     gl_Position = camera.viewProj * vec4(worldPos, 1.0);
     
-    // Transform normal
+    // Transform normal (for future use, but not used for lighting)
     vec3 N;
     N.x = dot(vec3(instance.row0.x, instance.row0.y, instance.row0.z), inNormal.xyz);
     N.y = dot(vec3(instance.row1.x, instance.row1.y, instance.row1.z), inNormal.xyz);
@@ -77,15 +70,12 @@ void main() {
     float invLen = inversesqrt(dot(N, N));
     N *= invLen;
     
-    // Calculate lighting
-    float lighting = fma(max(dot(N, LIGHT_DIR), 0.0), DIFFUSE_SCALE, AMBIENT);
-    
-    // Unpack color
+    // UNLIT: No lighting calculations - use raw instance color
     vec4 instanceColor = unpackUnorm4x8(instance.packedColor);
     
     // Output to fragment shader
     fragTexCoord = inTexCoord;
     fragNormal = N;
-    fragColor = vec4(instanceColor.rgb * lighting, instanceColor.a);
+    fragColor = instanceColor;  // UNLIT: Direct color, no lighting multiplier
     fragTextureID = instance.textureID;
 }

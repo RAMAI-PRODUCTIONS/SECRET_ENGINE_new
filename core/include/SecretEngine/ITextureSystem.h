@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
+#include <SecretEngine/CPP26Features.h>
 
 namespace SecretEngine {
 
@@ -38,7 +39,12 @@ public:
     
     // Synchronous loading
     virtual TextureHandle LoadTexture(const char* path) = 0;
-    virtual TextureHandle CreateTexture(const TextureDesc& desc, const void* data) = 0;
+    
+    // C++26: Type-safe texture creation
+    virtual TextureHandle CreateTexture(const TextureDesc& desc, std::span<const std::byte> data) = 0;
+    
+    // Legacy API
+    virtual TextureHandle CreateTextureRaw(const TextureDesc& desc, const void* data) = 0;
     
     // Asynchronous loading
     virtual TextureHandle LoadTextureAsync(const char* path) = 0;
@@ -50,7 +56,7 @@ public:
     
     // Streaming
     virtual void SetStreamingDistance(float distance) = 0;
-    virtual void UpdateStreaming(const float cameraPos[3]) = 0;
+    virtual void UpdateStreaming(std::span<const float, 3> cameraPos) = 0;
     
     // Stats
     virtual uint32_t GetLoadedTextureCount() const = 0;

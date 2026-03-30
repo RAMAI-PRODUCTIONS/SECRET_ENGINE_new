@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include <atomic>
+#include <SecretEngine/CPP26Features.h>
 
 namespace SecretEngine {
     class ICore;
@@ -122,8 +123,14 @@ private:
     // === INTERNAL LOADING ===
     bool LoadPNGToASTC(const char* path, std::vector<uint8_t>& outData, 
                        uint32_t& width, uint32_t& height, ASTCFormat& format);
-    uint32_t CreateTextureFromMemory(const void* data, uint32_t width, uint32_t height, 
+    
+    // C++26: Type-safe texture creation
+    uint32_t CreateTextureFromMemory(std::span<const std::byte> data, uint32_t width, uint32_t height, 
                                      VkFormat format, uint32_t mipLevels = 1);
+    
+    // Legacy API
+    uint32_t CreateTextureFromMemoryRaw(const void* data, uint32_t width, uint32_t height, 
+                                       VkFormat format, uint32_t mipLevels = 1);
     
     // === GPU RESOURCE CREATION ===
     bool CreateImage(uint32_t width, uint32_t height, VkFormat format, uint32_t mipLevels,
@@ -141,8 +148,13 @@ private:
     bool IsFormatSupported(VkFormat format) const;
     
     // === STAGING ===
-    bool UploadTextureData(VkImage image, const void* data, uint32_t width, uint32_t height, 
+    // C++26: Type-safe upload
+    bool UploadTextureData(VkImage image, std::span<const std::byte> data, uint32_t width, uint32_t height, 
                           VkFormat format, uint32_t mipLevels);
+    
+    // Legacy API
+    bool UploadTextureDataRaw(VkImage image, const void* data, uint32_t width, uint32_t height, 
+                             VkFormat format, uint32_t mipLevels);
     bool GenerateMipmaps(VkImage image, uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format);
     
     VulkanDevice* m_device = nullptr;

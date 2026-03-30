@@ -47,13 +47,14 @@ public:
     
     // ITextureSystem
     SecretEngine::TextureHandle LoadTexture(const char* path) override;
-    SecretEngine::TextureHandle CreateTexture(const SecretEngine::TextureDesc& desc, const void* data) override;
+    SecretEngine::TextureHandle CreateTexture(const SecretEngine::TextureDesc& desc, std::span<const std::byte> data) override;
+    SecretEngine::TextureHandle CreateTextureRaw(const SecretEngine::TextureDesc& desc, const void* data) override;
     SecretEngine::TextureHandle LoadTextureAsync(const char* path) override;
     bool IsTextureReady(SecretEngine::TextureHandle handle) const override;
     void UnloadTexture(SecretEngine::TextureHandle handle) override;
     void* GetNativeHandle(SecretEngine::TextureHandle handle) const override;
     void SetStreamingDistance(float distance) override;
-    void UpdateStreaming(const float cameraPos[3]) override;
+    void UpdateStreaming(std::span<const float, 3> cameraPos) override;
     uint32_t GetLoadedTextureCount() const override;
     size_t GetTextureMemoryUsage() const override;
     

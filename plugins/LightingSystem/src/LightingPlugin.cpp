@@ -68,8 +68,12 @@ uint32_t LightingPlugin::GetLightCount() const {
     return m_lightManager ? m_lightManager->GetLightCount() : 0;
 }
 
-const void* LightingPlugin::GetLightBuffer() const {
-    return m_lightManager ? m_lightManager->GetLightBuffer() : nullptr;
+std::span<const SecretEngine::LightData> LightingPlugin::GetLightBuffer() const {
+    return m_lightManager ? m_lightManager->GetLightBuffer() : std::span<const SecretEngine::LightData>{};
+}
+
+const void* LightingPlugin::GetLightBufferRaw() const {
+    return m_lightManager ? m_lightManager->GetLightBufferRaw() : nullptr;
 }
 
 size_t LightingPlugin::GetLightBufferSize() const {
