@@ -1,0 +1,49 @@
+{
+  "entities": [
+    {
+      "name": "RaceStart",
+      "transform": {
+        "position": [0, 1, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "isPlayerStart": true
+    },
+    {
+      "name": "Track",
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "mesh": {
+        "path": "meshes/Character.meshbin",
+        "color": [0.3, 0.3, 0.3, 1.0]
+      }
+    },
+    {
+      "name": "Car_1",
+      "transform": {
+        "position": [5, 0.5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [10, 10, 10]
+      },
+      "mesh": {
+        "path": "meshes/Character.meshbin",
+        "color": [1.0, 0.0, 0.0, 1.0]
+      }
+    },
+    {
+      "name": "Car_2",
+      "transform": {
+        "position": [-5, 0.5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [10, 10, 10]
+      },
+      "mesh": {
+        "path": "meshes/Character.meshbin",
+        "color": [0.0, 0.0, 1.0, 1.0]
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+# --- Build & Output ---
+build/
+bin/
+out/
+.gradle/
+.cxx/
+*.apk
+*.aar
+*.exe
+*.dll
+*.so
+*.lib
+*.pdb
+
+# --- Engine Specific Binaries (Non-textual) ---
+# These are compiled assets that look like junk to an AI
+*.meshbin
+*.texbin
+*.scenebin
+*.shaderbin
+*.mesh
+*.blob
+
+# --- Heavy Data Files ---
+# Large JSON dumps usually waste too many tokens
+glb_structure.json
+*.glb
+*.gltf
+*.png
+*.jpg
+*.jpeg
+*.ico
+
+# --- IDE & System ---
+.vs/
+.vscode/
+.idea/
+.git/
+*.sln
+*.vcxproj
+*.user
+.DS_Store
+Thumbs.db
+
+# --- Temporary/Logs ---
+*.log
+*.tmp

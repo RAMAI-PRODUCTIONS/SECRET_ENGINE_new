@@ -1,0 +1,11 @@
+{
+  "name": "LevelSystem",
+  "version": "1.0.0",
+  "type": "level_management",
+  "library": "LevelSystem.dll",
+  "dependencies": [],
+  "capabilities": ["level_system", "level_streaming", "level_transitions"],
+  "requirements": {
+    "min_engine_version": "0.1.0"
+  }
+}

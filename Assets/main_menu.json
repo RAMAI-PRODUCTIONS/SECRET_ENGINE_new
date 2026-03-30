@@ -1,0 +1,37 @@
+{
+  "entities": [
+    {
+      "name": "MenuCamera",
+      "transform": {
+        "position": [0, 5, 10],
+        "rotation": [-20, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "isPlayerStart": true
+    },
+    {
+      "name": "MenuBackground",
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [20, 20, 1]
+      },
+      "mesh": {
+        "path": "meshes/Plane.meshbin",
+        "color": [0.2, 0.2, 0.3, 1.0]
+      }
+    },
+    {
+      "name": "Logo",
+      "transform": {
+        "position": [0, 3, 0],
+        "rotation": [0, 0, 0],
+        "scale": [5, 5, 5]
+      },
+      "mesh": {
+        "path": "meshes/Character.meshbin",
+        "color": [1.0, 1.0, 1.0, 1.0]
+      }
+    }
+  ]
+}

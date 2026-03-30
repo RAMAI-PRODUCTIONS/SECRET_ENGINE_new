@@ -1,0 +1,155 @@
+{
+  "version": "1.0",
+  "entities": [
+    {
+      "name": "Ground",
+      "transform": {
+        "position": [0, -1, 0],
+        "rotation": [0, 0, 0],
+        "scale": [50, 1, 50]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.3, 0.5, 0.3, 1.0]
+    },
+    {
+      "name": "Platform_1",
+      "transform": {
+        "position": [10, 2, 5],
+        "rotation": [0, 0, 0],
+        "scale": [5, 0.5, 5]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.8, 0.3, 0.2, 1.0]
+    },
+    {
+      "name": "Platform_2",
+      "transform": {
+        "position": [-8, 3, -10],
+        "rotation": [0, 45, 0],
+        "scale": [4, 0.5, 4]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.2, 0.3, 0.8, 1.0]
+    },
+    {
+      "name": "Platform_3",
+      "transform": {
+        "position": [15, 5, -15],
+        "rotation": [0, 0, 15],
+        "scale": [6, 0.5, 3]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.9, 0.9, 0.1, 1.0]
+    },
+    {
+      "name": "Tower_1",
+      "transform": {
+        "position": [-15, 5, 10],
+        "rotation": [0, 0, 0],
+        "scale": [2, 10, 2]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.5, 0.5, 0.5, 1.0]
+    },
+    {
+      "name": "Tower_2",
+      "transform": {
+        "position": [20, 4, -5],
+        "rotation": [0, 0, 0],
+        "scale": [1.5, 8, 1.5]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.4, 0.4, 0.4, 1.0]
+    },
+    {
+      "name": "Character_1",
+      "transform": {
+        "position": [5, 1, 3],
+        "rotation": [0, 90, 0],
+        "scale": [1, 1, 1]
+      },
+      "mesh": "meshes/Character.meshbin",
+      "texture": "textures/diffuse.jpeg"
+    },
+    {
+      "name": "Character_2",
+      "transform": {
+        "position": [-12, 1, -8],
+        "rotation": [0, 180, 0],
+        "scale": [1, 1, 1]
+      },
+      "mesh": "meshes/Character.meshbin",
+      "texture": "textures/diffuse.jpeg"
+    },
+    {
+      "name": "Character_3",
+      "transform": {
+        "position": [18, 1, 12],
+        "rotation": [0, 270, 0],
+        "scale": [1, 1, 1]
+      },
+      "mesh": "meshes/Character.meshbin",
+      "texture": "textures/diffuse.jpeg"
+    },
+    {
+      "name": "Obstacle_1",
+      "transform": {
+        "position": [0, 1, 10],
+        "rotation": [45, 45, 0],
+        "scale": [2, 2, 2]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [1.0, 0.5, 0.0, 1.0]
+    },
+    {
+      "name": "Obstacle_2",
+      "transform": {
+        "position": [-5, 2, -5],
+        "rotation": [0, 90, 30],
+        "scale": [1.5, 3, 1.5]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.7, 0.2, 0.7, 1.0]
+    },
+    {
+      "name": "Wall_North",
+      "transform": {
+        "position": [0, 3, 25],
+        "rotation": [0, 0, 0],
+        "scale": [50, 6, 1]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.6, 0.6, 0.6, 1.0]
+    },
+    {
+      "name": "Wall_South",
+      "transform": {
+        "position": [0, 3, -25],
+        "rotation": [0, 0, 0],
+        "scale": [50, 6, 1]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.6, 0.6, 0.6, 1.0]
+    },
+    {
+      "name": "Wall_East",
+      "transform": {
+        "position": [25, 3, 0],
+        "rotation": [0, 90, 0],
+        "scale": [50, 6, 1]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.6, 0.6, 0.6, 1.0]
+    },
+    {
+      "name": "Wall_West",
+      "transform": {
+        "position": [-25, 3, 0],
+        "rotation": [0, 90, 0],
+        "scale": [50, 6, 1]
+      },
+      "mesh": "meshes/cube.meshbin",
+      "color": [0.6, 0.6, 0.6, 1.0]
+    }
+  ]
+}

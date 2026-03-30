@@ -1,0 +1,7 @@
+{
+  "name": "VulkanRenderer",
+  "version": "1.0.0",
+  "type": "renderer",
+  "library": "VulkanRenderer.dll",
+  "capabilities": ["rendering"]
+}

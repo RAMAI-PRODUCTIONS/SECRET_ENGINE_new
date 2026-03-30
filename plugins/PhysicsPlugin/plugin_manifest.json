@@ -1,0 +1,11 @@
+{
+  "name": "PhysicsPlugin",
+  "version": "1.0.0",
+  "type": "physics",
+  "library": "PhysicsPlugin.dll",
+  "dependencies": [],
+  "capabilities": ["physics", "raycasting"],
+  "requirements": {
+    "min_engine_version": "0.1.0"
+  }
+}

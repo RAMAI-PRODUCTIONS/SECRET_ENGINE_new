@@ -1,0 +1,11 @@
+{
+  "name": "FPSGameLogic",
+  "version": "1.0.0",
+  "type": "game",
+  "library": "FPSGameLogic.dll",
+  "dependencies": ["physics"],
+  "capabilities": ["fps_game"],
+  "requirements": {
+    "min_engine_version": "0.1.0"
+  }
+}

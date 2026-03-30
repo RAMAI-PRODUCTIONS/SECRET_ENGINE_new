@@ -1,0 +1,11 @@
+{
+  "name": "GameplayTagSystem",
+  "version": "1.0.0",
+  "type": "gameplay",
+  "library": "GameplayTagSystem.dll",
+  "dependencies": [],
+  "capabilities": ["gameplay_tags", "gameplay_abilities", "data_table"],
+  "requirements": {
+    "min_engine_version": "0.1.0"
+  }
+}

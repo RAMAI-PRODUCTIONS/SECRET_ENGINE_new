@@ -1,0 +1,58 @@
+{
+  "version": "1.0",
+  "description": "Joystick Only - No UI Buttons",
+  
+  "screen_zones": {
+    "ui_buttons_zone": {
+      "enabled": false,
+      "position": "top",
+      "height_percent": 0.0,
+      "comment": "UI buttons disabled"
+    },
+    "joystick_zone": {
+      "enabled": true,
+      "side": "left",
+      "comment": "Left half for movement joystick"
+    },
+    "look_zone": {
+      "enabled": true,
+      "side": "right",
+      "comment": "Right half for camera look and fire"
+    }
+  },
+  
+  "ui_buttons": [],
+  
+  "joystick": {
+    "enabled": true,
+    "position": {
+      "x_ndc": -0.7,
+      "y_ndc": 0.5,
+      "comment": "Bottom left corner"
+    },
+    "size": {
+      "base_size": 0.3,
+      "stick_size": 0.1,
+      "max_offset_multiplier": 0.5
+    },
+    "colors": {
+      "base": [0.2, 0.2, 0.2],
+      "stick": [1.0, 1.0, 1.0]
+    },
+    "touch_radius_pixels": 100.0,
+    "visible": true
+  },
+  
+  "touch_input": {
+    "joystick_sensitivity": 1.0,
+    "look_sensitivity": 10.0,
+    "fire_on_tap": true
+  },
+  
+  "layout": {
+    "button_inset": 0.01,
+    "button_text_scale": 0.035,
+    "button_text_spacing": 0.045,
+    "button_text_y_offset": 0.3
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "version": "1.0.0",
+  "gameplayTags": {
+    "Character.Type.Humanoid": {},
+    "Character.Type.Vehicle": {},
+    "Character.Type.Animal": {},
+    "Character.Type.Robot": {},
+    
+    "Character.Class.Soldier": {
+      "parent": "Character.Type.Humanoid",
+      "stats": {
+        "health": 100,
+        "speed": 5.0,
+        "jumpForce": 7.0
+      }
+    },
+    "Character.Class.Scout": {
+      "parent": "Character.Type.Humanoid",
+      "stats": {
+        "health": 75,
+        "speed": 7.0,
+        "jumpForce": 8.0
+      }
+    },
+    "Character.Class.Heavy": {
+      "parent": "Character.Type.Humanoid",
+      "stats": {
+        "health": 150,
+        "speed": 3.5,
+        "jumpForce": 5.0
+      }
+    },
+    
+    "Ability.Movement.Sprint": {
+      "type": "toggle",
+      "speedMultiplier": 1.6,
+      "staminaCost": 10.0
+    },
+    "Ability.Movement.Dash": {
+      "type": "instant",
+      "cooldown": 5.0,
+      "distance": 10.0,
+      "cost": 25.0
+    },
+    "Ability.Movement.DoubleJump": {
+      "type": "instant",
+      "cooldown": 0.0,
+      "forceMultiplier": 0.8
+    },
+    
+    "Ability.Combat.Shoot": {
+      "type": "instant",
+      "damage": 25.0,
+      "range": 100.0,
+      "fireRate": 0.1
+    },
+    "Ability.Combat.Grenade": {
+      "type": "instant",
+      "cooldown": 10.0,
+      "damage": 100.0,
+      "radius": 5.0
+    },
+    "Ability.Combat.Melee": {
+      "type": "instant",
+      "cooldown": 1.0,
+      "damage": 50.0,
+      "range": 2.0
+    },
+    
+    "Ability.Defense.Shield": {
+      "type": "toggle",
+      "duration": 5.0,
+      "cooldown": 15.0,
+      "damageReduction": 0.5
+    },
+    "Ability.Defense.Heal": {
+      "type": "channeled",
+      "duration": 3.0,
+      "cooldown": 20.0,
+      "healPerSecond": 20.0
+    },
+    
+    "Status.Buff.SpeedBoost": {
+      "duration": 10.0,
+      "speedMultiplier": 1.5
+    },
+    "Status.Buff.DamageBoost": {
+      "duration": 15.0,
+      "damageMultiplier": 1.5
+    },
+    "Status.Debuff.Slow": {
+      "duration": 5.0,
+      "speedMultiplier": 0.5
+    },
+    "Status.Debuff.Stun": {
+      "duration": 2.0,
+      "canMove": false,
+      "canAttack": false
+    },
+    
+    "Weapon.Type.Rifle": {
+      "damage": 25.0,
+      "fireRate": 0.1,
+      "range": 100.0,
+      "ammo": 30,
+      "reloadTime": 2.0
+    },
+    "Weapon.Type.Shotgun": {
+      "damage": 80.0,
+      "fireRate": 0.8,
+      "range": 20.0,
+      "ammo": 8,
+      "reloadTime": 2.5,
+      "pellets": 8
+    },
+    "Weapon.Type.Sniper": {
+      "damage": 100.0,
+      "fireRate": 1.5,
+      "range": 300.0,
+      "ammo": 5,
+      "reloadTime": 3.0
+    }
+  },
+  
+  "characterDefinitions": [
+    {
+      "id": "player_soldier",
+      "tags": [
+        "Character.Class.Soldier",
+        "Ability.Movement.Sprint",
+        "Ability.Movement.Dash",
+        "Ability.Combat.Shoot",
+        "Ability.Combat.Grenade",
+        "Weapon.Type.Rifle"
+      ],
+      "team": "player"
+    },
+    {
+      "id": "player_scout",
+      "tags": [
+        "Character.Class.Scout",
+        "Ability.Movement.Sprint",
+        "Ability.Movement.DoubleJump",
+        "Ability.Combat.Shoot",
+        "Weapon.Type.Rifle"
+      ],
+      "team": "player"
+    },
+    {
+      "id": "player_heavy",
+      "tags": [
+        "Character.Class.Heavy",
+        "Ability.Defense.Shield",
+        "Ability.Combat.Shoot",
+        "Weapon.Type.Shotgun"
+      ],
+      "team": "player"
+    },
+    {
+      "id": "enemy_soldier",
+      "tags": [
+        "Character.Class.Soldier",
+        "Ability.Combat.Shoot",
+        "Weapon.Type.Rifle"
+      ],
+      "team": "enemy",
+      "ai": {
+        "enabled": true,
+        "behavior": "aggressive"
+      }
+    },
+    {
+      "id": "sports_car",
+      "tags": [
+        "Character.Type.Vehicle"
+      ],
+      "stats": {
+        "health": 500,
+        "speed": 25.0,
+        "mass": 1200.0
+      },
+      "team": "player"
+    },
+    {
+      "id": "horse",
+      "tags": [
+        "Character.Type.Animal",
+        "Ability.Movement.Sprint"
+      ],
+      "stats": {
+        "health": 200,
+        "speed": 8.0,
+        "sprintSpeed": 15.0,
+        "stamina": 100.0
+      },
+      "rideable": true,
+      "team": "neutral"
+    }
+  ],
+  
+  "abilityEffects": {
+    "Ability.Movement.Sprint": {
+      "onActivate": [
+        {"type": "multiplySpeed", "value": 1.6},
+        {"type": "drainStamina", "rate": 10.0}
+      ],
+      "onDeactivate": [
+        {"type": "resetSpeed"}
+      ]
+    },
+    "Ability.Movement.Dash": {
+      "onActivate": [
+        {"type": "addVelocity", "direction": "forward", "force": 10.0},
+        {"type": "consumeResource", "amount": 25.0}
+      ]
+    },
+    "Ability.Combat.Shoot": {
+      "onActivate": [
+        {"type": "raycast", "damage": 25.0, "range": 100.0},
+        {"type": "consumeAmmo", "amount": 1}
+      ]
+    },
+    "Ability.Defense.Shield": {
+      "onActivate": [
+        {"type": "addTag", "tag": "Status.Buff.Shield"},
+        {"type": "multiplyDamageTaken", "value": 0.5}
+      ],
+      "onDeactivate": [
+        {"type": "removeTag", "tag": "Status.Buff.Shield"}
+      ]
+    }
+  },
+  
+  "tagRelationships": {
+    "Character.Class.Soldier": {
+      "grants": ["Character.Type.Humanoid"],
+      "blocks": ["Character.Type.Vehicle", "Character.Type.Animal"]
+    },
+    "Status.Debuff.Stun": {
+      "blocks": ["Ability.Movement.Sprint", "Ability.Combat.Shoot"]
+    },
+    "Status.Buff.SpeedBoost": {
+      "stacks": false,
+      "overrides": ["Status.Debuff.Slow"]
+    }
+  }
+}

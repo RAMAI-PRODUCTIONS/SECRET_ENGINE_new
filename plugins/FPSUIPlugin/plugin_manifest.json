@@ -1,0 +1,11 @@
+{
+  "name": "FPSUIPlugin",
+  "version": "1.0.0",
+  "type": "ui",
+  "library": "FPSUIPlugin.dll",
+  "dependencies": ["fps_game", "rendering"],
+  "capabilities": ["fps_ui"],
+  "requirements": {
+    "min_engine_version": "0.1.0"
+  }
+}

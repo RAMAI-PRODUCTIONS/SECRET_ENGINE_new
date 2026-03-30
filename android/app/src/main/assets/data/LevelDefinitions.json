@@ -1,0 +1,82 @@
+{
+  "version": "1.0.0",
+  "levels": [
+    {
+      "name": "MainMenu",
+      "path": "Assets/main_menu.json",
+      "type": "persistent",
+      "streamingMethod": "always",
+      "autoLoad": true,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [0, 0, 0],
+        "extents": [50, 50, 50]
+      }
+    },
+    {
+      "name": "Scene",
+      "path": "Assets/scene.json",
+      "type": "streaming",
+      "streamingMethod": "manual",
+      "autoLoad": false,
+      "blockOnLoad": true,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [0, 0, 0],
+        "extents": [500, 100, 500]
+      }
+    },
+    {
+      "name": "FPS_Arena",
+      "path": "Assets/fps_arena.json",
+      "type": "streaming",
+      "streamingMethod": "manual",
+      "autoLoad": false,
+      "blockOnLoad": true,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [0, 0, 0],
+        "extents": [100, 50, 100]
+      }
+    },
+    {
+      "name": "RacingTrack",
+      "path": "Assets/racing_track.json",
+      "type": "streaming",
+      "streamingMethod": "manual",
+      "autoLoad": false,
+      "blockOnLoad": true,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [0, 0, 0],
+        "extents": [200, 50, 100]
+      }
+    },
+    {
+      "name": "OpenWorld_Zone1",
+      "path": "levels/OpenWorld_Zone1.json",
+      "type": "streaming",
+      "streamingMethod": "distance",
+      "streamingDistance": 2000.0,
+      "autoLoad": false,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [0, 0, 0],
+        "extents": [1000, 200, 1000]
+      }
+    },
+    {
+      "name": "OpenWorld_Zone2",
+      "path": "levels/OpenWorld_Zone2.json",
+      "type": "streaming",
+      "streamingMethod": "distance",
+      "streamingDistance": 2000.0,
+      "autoLoad": false,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [2000, 0, 0],
+        "extents": [1000, 200, 1000]
+      }
+    }
+  ]
+}
