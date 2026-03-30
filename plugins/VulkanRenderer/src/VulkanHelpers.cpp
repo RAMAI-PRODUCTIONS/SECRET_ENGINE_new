@@ -66,7 +66,16 @@ uint32_t Helpers::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeF
     return 0;
 }
 
-void Helpers::MapAndCopy(VkDevice device, VkDeviceMemory memory, VkDeviceSize size, const void* data) {
+// C++26: Type-safe span-based copy
+void Helpers::MapAndCopy(VkDevice device, VkDeviceMemory memory, std::span<const std::byte> data) {
+    void* mappedData;
+    vkMapMemory(device, memory, 0, data.size(), 0, &mappedData);
+    memcpy(mappedData, data.data(), data.size());
+    vkUnmapMemory(device, memory);
+}
+
+// Legacy implementation
+void Helpers::MapAndCopyRaw(VkDevice device, VkDeviceMemory memory, VkDeviceSize size, const void* data) {
     void* mappedData;
     vkMapMemory(device, memory, 0, size, 0, &mappedData);
     memcpy(mappedData, data, size);

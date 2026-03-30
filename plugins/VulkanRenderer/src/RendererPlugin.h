@@ -137,4 +137,12 @@ private:
     std::vector<Float3> m_instanceColors;
     float m_totalTime = 0.0f;
     std::map<int, std::string> m_debugStrings;
+    
+    // GPU Timing
+    VkQueryPool m_queryPool = VK_NULL_HANDLE;
+    bool m_timestampsSupported = false;
+    float m_timestampPeriod = 1.0f;
+    bool CreateTimestampQueries();
+    void RecordGPUTimestamps(VkCommandBuffer cmd);
+    void ReadGPUTimestamps();
 };

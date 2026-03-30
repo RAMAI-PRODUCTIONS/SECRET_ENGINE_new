@@ -9,14 +9,16 @@ cmake_minimum_required(VERSION 3.20)
 project(SecretEngine VERSION 0.1.0 LANGUAGES C CXX)
 
 # --- HYBRID STANDARD STRATEGY ---
+# Note: Using C++20 for now as CMake 3.22.1 doesn't recognize C++26
+# std::span is available in C++20, and we have fallbacks for C++26-only features
 if(ANDROID)
-    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD 20)
     add_definitions(-DSE_PLATFORM_ANDROID)
-    message(STATUS "Target: ANDROID - Standard: C++17")
+    message(STATUS "Target: ANDROID - Standard: C++20 (with C++26 features via fallbacks)")
 elseif(WIN32)
     set(CMAKE_CXX_STANDARD 20)
     add_definitions(-DSE_PLATFORM_WINDOWS)
-    message(STATUS "Target: WINDOWS - Standard: C++20")
+    message(STATUS "Target: WINDOWS - Standard: C++20 (with C++26 features via fallbacks)")
 endif()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

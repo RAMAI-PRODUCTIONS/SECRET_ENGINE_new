@@ -348,20 +348,20 @@ void PhysicsPlugin::ResolveCollision(
 }
 
 // ============================================================================
-// PUBLIC API IMPLEMENTATION
+// PUBLIC API IMPLEMENTATION (C++26: std::span)
 // ============================================================================
 
 RaycastHit PhysicsPlugin::Raycast(
-    const float origin[3],
-    const float direction[3],
+    std::span<const float, 3> origin,
+    std::span<const float, 3> direction,
     float maxDistance
 ) {
     return RaycastWithMask(origin, direction, maxDistance, CollisionLayer::All);
 }
 
 RaycastHit PhysicsPlugin::RaycastWithMask(
-    const float origin[3],
-    const float direction[3],
+    std::span<const float, 3> origin,
+    std::span<const float, 3> direction,
     float maxDistance,
     uint32_t layerMask
 ) {
@@ -369,7 +369,7 @@ RaycastHit PhysicsPlugin::RaycastWithMask(
     closestHit.distance = maxDistance;
     
     float dir[3];
-    Normalize(direction, dir);
+    Normalize(direction.data(), dir);
     
     auto& entities = m_world->GetAllEntities();
     
@@ -395,7 +395,7 @@ RaycastHit PhysicsPlugin::RaycastWithMask(
                 closestHit.distance = distance;
                 
                 // Calculate hit point
-                ScaleAdd(origin, dir, distance, closestHit.point);
+                ScaleAdd(origin.data(), dir, distance, closestHit.point);
                 
                 // Calculate normal (simplified - point away from center)
                 Sub(closestHit.point, transform->position, closestHit.normal);
@@ -408,8 +408,8 @@ RaycastHit PhysicsPlugin::RaycastWithMask(
 }
 
 bool PhysicsPlugin::RaycastShape(
-    const float origin[3],
-    const float direction[3],
+    std::span<const float, 3> origin,
+    std::span<const float, 3> direction,
     const TransformComponent* transform,
     const PhysicsBody* body,
     float& outDistance
@@ -417,14 +417,14 @@ bool PhysicsPlugin::RaycastShape(
     switch (body->shapeType) {
         case ShapeType::Sphere:
             return CollisionDetection::RaySphere(
-                origin, direction,
+                origin.data(), direction.data(),
                 transform->position, body->shapeData[0],
                 outDistance
             );
             
         case ShapeType::Box:
             return CollisionDetection::RayBox(
-                origin, direction,
+                origin.data(), direction.data(),
                 transform->position, body->shapeData,
                 outDistance
             );
@@ -432,7 +432,7 @@ bool PhysicsPlugin::RaycastShape(
         case ShapeType::Capsule:
             // Simplified: treat as sphere
             return CollisionDetection::RaySphere(
-                origin, direction,
+                origin.data(), direction.data(),
                 transform->position, body->shapeData[0] + body->shapeData[1],
                 outDistance
             );
@@ -443,7 +443,7 @@ bool PhysicsPlugin::RaycastShape(
 }
 
 bool PhysicsPlugin::CheckGround(
-    const float position[3],
+    std::span<const float, 3> position,
     float radius,
     float checkDistance
 ) {
@@ -457,7 +457,7 @@ bool PhysicsPlugin::CheckGround(
 }
 
 bool PhysicsPlugin::OverlapSphere(
-    const float position[3],
+    std::span<const float, 3> position,
     float radius,
     uint32_t layerMask
 ) {
@@ -476,7 +476,7 @@ bool PhysicsPlugin::OverlapSphere(
         
         if (body->shapeType == ShapeType::Sphere) {
             if (CollisionDetection::TestSphereSphere(
-                position, radius,
+                position.data(), radius,
                 transform->position, body->shapeData[0],
                 nullptr)) {
                 return true;
@@ -488,8 +488,8 @@ bool PhysicsPlugin::OverlapSphere(
 }
 
 bool PhysicsPlugin::OverlapBox(
-    const float position[3],
-    const float halfExtents[3],
+    std::span<const float, 3> position,
+    std::span<const float, 3> halfExtents,
     uint32_t layerMask
 ) {
     auto& entities = m_world->GetAllEntities();
@@ -507,7 +507,7 @@ bool PhysicsPlugin::OverlapBox(
         
         if (body->shapeType == ShapeType::Box) {
             if (CollisionDetection::TestBoxBox(
-                position, halfExtents,
+                position.data(), halfExtents.data(),
                 transform->position, body->shapeData,
                 nullptr)) {
                 return true;
@@ -518,16 +518,16 @@ bool PhysicsPlugin::OverlapBox(
     return false;
 }
 
-void PhysicsPlugin::AddForce(Entity entity, const float force[3]) {
+void PhysicsPlugin::AddForce(Entity entity, std::span<const float, 3> force) {
     auto* body = static_cast<PhysicsBody*>(
         m_world->GetComponent(entity, PhysicsBody::TypeID)
     );
     if (!body || body->bodyType != BodyType::Dynamic) return;
     
-    Add(body->force, force, body->force);
+    Add(body->force, force.data(), body->force);
 }
 
-void PhysicsPlugin::AddImpulse(Entity entity, const float impulse[3]) {
+void PhysicsPlugin::AddImpulse(Entity entity, std::span<const float, 3> impulse) {
     auto* body = static_cast<PhysicsBody*>(
         m_world->GetComponent(entity, PhysicsBody::TypeID)
     );
@@ -536,7 +536,7 @@ void PhysicsPlugin::AddImpulse(Entity entity, const float impulse[3]) {
     ApplyImpulseInternal(body, impulse);
 }
 
-void PhysicsPlugin::SetVelocity(Entity entity, const float velocity[3]) {
+void PhysicsPlugin::SetVelocity(Entity entity, std::span<const float, 3> velocity) {
     auto* body = static_cast<PhysicsBody*>(
         m_world->GetComponent(entity, PhysicsBody::TypeID)
     );
@@ -548,7 +548,7 @@ void PhysicsPlugin::SetVelocity(Entity entity, const float velocity[3]) {
 }
 
 void PhysicsPlugin::AddExplosionForce(
-    const float position[3],
+    std::span<const float, 3> position,
     float force,
     float radius
 ) {
@@ -566,7 +566,7 @@ void PhysicsPlugin::AddExplosionForce(
         if (!transform) continue;
         
         float delta[3];
-        Sub(transform->position, position, delta);
+        Sub(transform->position, position.data(), delta);
         float dist = Length(delta);
         
         if (dist < radius && dist > 0.001f) {
@@ -580,7 +580,7 @@ void PhysicsPlugin::AddExplosionForce(
     }
 }
 
-void PhysicsPlugin::SetGravity(const float gravity[3]) {
+void PhysicsPlugin::SetGravity(std::span<const float, 3> gravity) {
     m_gravity[0] = gravity[0];
     m_gravity[1] = gravity[1];
     m_gravity[2] = gravity[2];
@@ -593,10 +593,10 @@ bool PhysicsPlugin::ShouldCollide(
     return (layerA & maskB) != 0 && (layerB & maskA) != 0;
 }
 
-void PhysicsPlugin::ApplyImpulseInternal(PhysicsBody* body, const float impulse[3]) {
+void PhysicsPlugin::ApplyImpulseInternal(PhysicsBody* body, std::span<const float, 3> impulse) {
     if (body->inverseMass > 0.0f) {
         float deltaV[3];
-        Scale(impulse, body->inverseMass, deltaV);
+        Scale(impulse.data(), body->inverseMass, deltaV);
         Add(body->velocity, deltaV, body->velocity);
     }
 }

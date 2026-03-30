@@ -1,6 +1,7 @@
 #pragma once
 #include <SecretEngine/ILightingSystem.h>
 #include <vector>
+#include <SecretEngine/CPP26Features.h>
 
 namespace SecretEngine {
 
@@ -14,7 +15,12 @@ public:
     void RemoveLight(uint32_t lightID);
     const LightData* GetLight(uint32_t lightID) const;
     uint32_t GetLightCount() const;
-    const void* GetLightBuffer() const;
+    
+    // C++26: Type-safe buffer access
+    std::span<const LightData> GetLightBuffer() const;
+    
+    // Legacy API
+    const void* GetLightBufferRaw() const;
     size_t GetLightBufferSize() const;
     
 private:

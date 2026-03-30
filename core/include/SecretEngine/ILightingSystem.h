@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <SecretEngine/CPP26Features.h>
 
 namespace SecretEngine {
 
@@ -25,7 +26,12 @@ public:
     virtual void RemoveLight(uint32_t lightID) = 0;
     virtual const LightData* GetLight(uint32_t lightID) const = 0;
     virtual uint32_t GetLightCount() const = 0;
-    virtual const void* GetLightBuffer() const = 0;
+    
+    // C++26: Type-safe buffer access with std::span
+    virtual std::span<const LightData> GetLightBuffer() const = 0;
+    
+    // Legacy API (deprecated, use GetLightBuffer() instead)
+    virtual const void* GetLightBufferRaw() const = 0;
     virtual size_t GetLightBufferSize() const = 0;
 };
 

@@ -1,0 +1,30 @@
+Test all C++26 features on Android device:
+
+1. Build debug APK: cd android && ./gradlew assembleDebug
+2. Install: adb install -r app/build/outputs/apk/debug/app-debug.apk
+3. Clear logs: adb logcat -c
+4. Start monitoring: adb logcat | grep -E "SecretEngine|sanitizer|ASAN|UBSAN|CPP26"
+5. Launch app: adb shell am start -n com.secretengine.game/.MainActivity
+
+VERIFY:
+- Sanitizers initialize (look for "AddressSanitizer" or "UndefinedBehaviorSanitizer")
+- Feature detection logs (look for "CPP26" or "Feature")
+- std::span usage (look for "LightingSystem" or "MaterialSystem" buffer logs)
+- Physics system (look for "PhysicsPlugin" with raycast/collision)
+- Frame rate stable (look for "Frame time" around 16ms)
+- No crashes or memory leaks
+
+REPORT:
+- Device model and Android version
+- Build success/failure
+- Sanitizer status
+- Feature detection results
+- Any errors or warnings
+- Frame rate performance
+- Overall pass/fail
+
+If build fails, show first 20 error lines.
+If app crashes, show crash log.
+If sanitizers catch bugs, show the report.
+
+Save full logcat to cpp26_device_test_log.txt for analysis.

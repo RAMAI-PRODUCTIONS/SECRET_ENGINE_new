@@ -61,7 +61,13 @@ public:
         return {};
     }
 
-    bool LoadBinaryToBuffer(const char* path, void* dest, size_t size) override {
+    // C++26: Type-safe span-based loading
+    bool LoadBinaryToBuffer(const char* path, std::span<std::byte> dest) override {
+        return LoadBinaryToBufferRaw(path, dest.data(), dest.size());
+    }
+    
+    // Legacy implementation
+    bool LoadBinaryToBufferRaw(const char* path, void* dest, size_t size) override {
 #if defined(SE_PLATFORM_ANDROID)
         if (g_AndroidApp && g_AndroidApp->activity && g_AndroidApp->activity->assetManager) {
             AAsset* asset = AAssetManager_open(g_AndroidApp->activity->assetManager, path, AASSET_MODE_BUFFER);

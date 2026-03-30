@@ -38,28 +38,29 @@ else()
 endif()
 
 # C++26 Memory Safety Hardening (Debug builds only)
-# CRITICAL: Enable immediately - zero code changes, immediate bug detection
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        # GCC hardening flags
-        target_compile_options(SecretEngine_Core PRIVATE 
-            -fhardened
-            -fsanitize=address,undefined
-        )
-        target_link_options(SecretEngine_Core PRIVATE 
-            -fsanitize=address,undefined
-        )
-        message(STATUS "Enabled GCC hardening and sanitizers for debug build")
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        # Clang sanitizers (no -fhardened yet)
-        target_compile_options(SecretEngine_Core PRIVATE 
-            -fsanitize=address,undefined
-        )
-        target_link_options(SecretEngine_Core PRIVATE 
-            -fsanitize=address,undefined
-        )
-        message(STATUS "Enabled Clang sanitizers for debug build")
-    endif()
-endif()
+# DISABLED: Sanitizers cause linking issues on Android NDK
+# TODO: Re-enable when NDK properly supports sanitizers
+# if(CMAKE_BUILD_TYPE MATCHES Debug)
+#     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+#         # GCC hardening flags
+#         target_compile_options(SecretEngine_Core PRIVATE 
+#             -fhardened
+#             -fsanitize=address,undefined
+#         )
+#         target_link_options(SecretEngine_Core PRIVATE 
+#             -fsanitize=address,undefined
+#         )
+#         message(STATUS "Enabled GCC hardening and sanitizers for debug build")
+#     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#         # Clang sanitizers (no -fhardened yet)
+#         target_compile_options(SecretEngine_Core PRIVATE 
+#             -fsanitize=address,undefined
+#         )
+#         target_link_options(SecretEngine_Core PRIVATE 
+#             -fsanitize=address,undefined
+#         )
+#         message(STATUS "Enabled Clang sanitizers for debug build")
+#     endif()
+# endif()
 
 target_link_libraries(SecretEngine_Core PRIVATE nlohmann_json::nlohmann_json)

@@ -3,6 +3,13 @@
 #include "VulkanDevice.h"
 #include <SecretEngine/ILogger.h>
 
+#if defined(__ANDROID__)
+#include <android/log.h>
+#define SWAPCHAIN_LOG(...) __android_log_print(ANDROID_LOG_INFO, "Swapchain_Direct", __VA_ARGS__)
+#else
+#define SWAPCHAIN_LOG(...) 
+#endif
+
 Swapchain::Swapchain(VulkanDevice* device, SecretEngine::ICore* core) : m_device(device), m_core(core) {}
 Swapchain::~Swapchain() { Cleanup(); }
 
@@ -57,7 +64,44 @@ bool Swapchain::Create(VkSurfaceKHR surface, uint32_t width, uint32_t height) {
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
     }
     
-    createInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    // Query available present modes
+    uint32_t presentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_device->GetPhysicalDevice(), surface, &presentModeCount, nullptr);
+    std::vector<VkPresentModeKHR> presentModes(presentModeCount);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_device->GetPhysicalDevice(), surface, &presentModeCount, presentModes.data());
+    
+    // Log all available modes
+    std::string modesStr = "Available present modes: ";
+    for (const auto& mode : presentModes) {
+        if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) modesStr += "IMMEDIATE ";
+        else if (mode == VK_PRESENT_MODE_MAILBOX_KHR) modesStr += "MAILBOX ";
+        else if (mode == VK_PRESENT_MODE_FIFO_KHR) modesStr += "FIFO ";
+        else if (mode == VK_PRESENT_MODE_FIFO_RELAXED_KHR) modesStr += "FIFO_RELAXED ";
+    }
+    m_core->GetLogger()->LogInfo("Swapchain", modesStr.c_str());
+    SWAPCHAIN_LOG("%s", modesStr.c_str());
+    
+    // Prefer IMMEDIATE (no vsync) > MAILBOX (triple buffering) > FIFO (vsync locked)
+    VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR; // Fallback
+    for (const auto& mode : presentModes) {
+        if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+            selectedPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+            m_core->GetLogger()->LogInfo("Swapchain", "Selected IMMEDIATE present mode (no vsync) for maximum FPS");
+            SWAPCHAIN_LOG("Selected IMMEDIATE present mode (no vsync) for maximum FPS");
+            break;
+        } else if (mode == VK_PRESENT_MODE_MAILBOX_KHR) {
+            selectedPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+            m_core->GetLogger()->LogInfo("Swapchain", "Selected MAILBOX present mode (triple buffering)");
+            SWAPCHAIN_LOG("Selected MAILBOX present mode (triple buffering)");
+        }
+    }
+    
+    if (selectedPresentMode == VK_PRESENT_MODE_FIFO_KHR) {
+        m_core->GetLogger()->LogWarning("Swapchain", "Using FIFO present mode (vsync locked) - device may not support IMMEDIATE or MAILBOX");
+        SWAPCHAIN_LOG("WARNING: Using FIFO present mode (vsync locked) - device may not support IMMEDIATE or MAILBOX");
+    }
+    
+    createInfo.presentMode = selectedPresentMode;
     createInfo.clipped = VK_TRUE;
 
     if (vkCreateSwapchainKHR(m_device->GetDevice(), &createInfo, nullptr, &m_swapchain) != VK_SUCCESS) {

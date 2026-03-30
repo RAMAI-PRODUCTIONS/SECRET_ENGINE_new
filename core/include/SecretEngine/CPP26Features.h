@@ -73,6 +73,14 @@
     #define SE_HAS_SIMD 0
 #endif
 
+// std::span (C++20, but not always available in Android NDK)
+#if defined(__cpp_lib_span) && __cpp_lib_span >= 202002L
+    #define SE_HAS_SPAN 1
+    #include <span>
+#else
+    #define SE_HAS_SPAN 0
+#endif
+
 // std::mdspan (C++23, but relevant)
 #if defined(__cpp_lib_mdspan) && __cpp_lib_mdspan >= 202207L
     #define SE_HAS_MDSPAN 1
@@ -126,118 +134,372 @@
 #endif
 
 // ============================================================================
+// span Fallback (C++20 feature, but not always available in Android NDK)
+// ============================================================================
+
+#if !SE_HAS_SPAN
+    #include <cstddef>
+    #include <type_traits>
+    #include <iterator>
+    
+    namespace std {
+        /**
+         * Lightweight non-owning view over a contiguous sequence (C++20 std::span fallback)
+         * 
+         * This is a minimal implementation that provides the essential functionality
+         * needed for the SecretEngine codebase.
+         */
+        inline constexpr size_t dynamic_extent = static_cast<size_t>(-1);
+        
+        template<typename T, size_t Extent = dynamic_extent>
+        class span {
+        public:
+            using element_type = T;
+            using value_type = typename std::remove_cv<T>::type;
+            using size_type = size_t;
+            using difference_type = ptrdiff_t;
+            using pointer = T*;
+            using const_pointer = const T*;
+            using reference = T&;
+            using const_reference = const T&;
+            using iterator = T*;
+            using const_iterator = const T*;
+            
+            static constexpr size_t extent = Extent;
+            
+            // Constructors
+            constexpr span() noexcept : data_(nullptr), size_(0) {
+                static_assert(Extent == 0 || Extent == dynamic_extent, 
+                             "Cannot default construct a span with static extent != 0");
+            }
+            
+            constexpr span(pointer ptr, size_type count) noexcept 
+                : data_(ptr), size_(count) {
+                if constexpr (Extent != dynamic_extent) {
+                    // In debug builds, assert the size matches
+                    assert(count == Extent && "span size mismatch with static extent");
+                }
+            }
+            
+            constexpr span(pointer first, pointer last) noexcept 
+                : data_(first), size_(static_cast<size_type>(last - first)) {
+                if constexpr (Extent != dynamic_extent) {
+                    assert(size_ == Extent && "span size mismatch with static extent");
+                }
+            }
+            
+            template<size_t N>
+            constexpr span(element_type (&arr)[N]) noexcept 
+                : data_(arr), size_(N) {
+                static_assert(Extent == dynamic_extent || Extent == N,
+                             "span extent mismatch with array size");
+            }
+            
+            // Copy constructor
+            constexpr span(const span&) noexcept = default;
+            constexpr span& operator=(const span&) noexcept = default;
+            
+            // Element access
+            constexpr reference operator[](size_type idx) const noexcept {
+                assert(idx < size_ && "span index out of bounds");
+                return data_[idx];
+            }
+            
+            constexpr reference front() const noexcept {
+                assert(!empty() && "span::front() called on empty span");
+                return data_[0];
+            }
+            
+            constexpr reference back() const noexcept {
+                assert(!empty() && "span::back() called on empty span");
+                return data_[size_ - 1];
+            }
+            
+            constexpr pointer data() const noexcept { return data_; }
+            
+            // Iterators
+            constexpr iterator begin() const noexcept { return data_; }
+            constexpr iterator end() const noexcept { return data_ + size_; }
+            constexpr const_iterator cbegin() const noexcept { return data_; }
+            constexpr const_iterator cend() const noexcept { return data_ + size_; }
+            
+            // Capacity
+            constexpr size_type size() const noexcept { return size_; }
+            constexpr size_type size_bytes() const noexcept { return size_ * sizeof(T); }
+            constexpr bool empty() const noexcept { return size_ == 0; }
+            
+            // Subviews
+            constexpr span<T, dynamic_extent> first(size_type count) const {
+                assert(count <= size_ && "span::first() count exceeds size");
+                return span<T, dynamic_extent>(data_, count);
+            }
+            
+            constexpr span<T, dynamic_extent> last(size_type count) const {
+                assert(count <= size_ && "span::last() count exceeds size");
+                return span<T, dynamic_extent>(data_ + (size_ - count), count);
+            }
+            
+            constexpr span<T, dynamic_extent> subspan(size_type offset, 
+                                                      size_type count = dynamic_extent) const {
+                assert(offset <= size_ && "span::subspan() offset exceeds size");
+                const size_type actual_count = (count == dynamic_extent) 
+                    ? (size_ - offset) 
+                    : count;
+                assert(offset + actual_count <= size_ && "span::subspan() range exceeds size");
+                return span<T, dynamic_extent>(data_ + offset, actual_count);
+            }
+            
+        private:
+            pointer data_;
+            size_type size_;
+        };
+        
+        // Deduction guides
+        template<typename T, size_t N>
+        span(T (&)[N]) -> span<T, N>;
+        
+        // Helper to convert byte spans
+        template<typename T, size_t Extent>
+        span<const byte, (Extent == dynamic_extent ? dynamic_extent : sizeof(T) * Extent)>
+        as_bytes(span<T, Extent> s) noexcept {
+            return span<const byte, (Extent == dynamic_extent ? dynamic_extent : sizeof(T) * Extent)>(
+                reinterpret_cast<const byte*>(s.data()), s.size_bytes());
+        }
+        
+        template<typename T, size_t Extent>
+        span<byte, (Extent == dynamic_extent ? dynamic_extent : sizeof(T) * Extent)>
+        as_writable_bytes(span<T, Extent> s) noexcept {
+            return span<byte, (Extent == dynamic_extent ? dynamic_extent : sizeof(T) * Extent)>(
+                reinterpret_cast<byte*>(s.data()), s.size_bytes());
+        }
+    }
+#endif
+
+// ============================================================================
 // inplace_vector Fallback
 // ============================================================================
 
 #if !SE_HAS_INPLACE_VECTOR
-    #include <vector>
+    #include <cassert>
+    #include <cstddef>
+    #include <utility>
+    #include <type_traits>
     
     namespace std {
-        // Minimal fallback using std::vector
-        // TODO: Replace with proper stack-based implementation
+        // Stack-based fixed-capacity vector (C++26 std::inplace_vector fallback)
         template<typename T, size_t N>
         class inplace_vector {
-            std::vector<T> data_;
+            static_assert(N > 0, "inplace_vector capacity must be greater than 0");
+            
+            alignas(T) std::byte storage_[N * sizeof(T)];
+            size_t size_ = 0;
+            
+            T* data() noexcept {
+                return reinterpret_cast<T*>(storage_);
+            }
+            
+            const T* data() const noexcept {
+                return reinterpret_cast<const T*>(storage_);
+            }
+            
         public:
-            inplace_vector() { data_.reserve(N); }
+            using value_type = T;
+            using size_type = size_t;
+            using difference_type = ptrdiff_t;
+            using reference = T&;
+            using const_reference = const T&;
+            using pointer = T*;
+            using const_pointer = const T*;
+            using iterator = T*;
+            using const_iterator = const T*;
             
-            void push_back(const T& value) { 
-                assert(data_.size() < N && "inplace_vector capacity exceeded");
-                data_.push_back(value); 
+            // Constructors
+            constexpr inplace_vector() noexcept = default;
+            
+            constexpr inplace_vector(size_type count, const T& value) {
+                assert(count <= N && "inplace_vector initial size exceeds capacity");
+                for (size_type i = 0; i < count; ++i) {
+                    push_back(value);
+                }
             }
             
-            void push_back(T&& value) { 
-                assert(data_.size() < N && "inplace_vector capacity exceeded");
-                data_.push_back(std::move(value)); 
+            // Destructor
+            ~inplace_vector() {
+                clear();
             }
             
-            auto begin() { return data_.begin(); }
-            auto end() { return data_.end(); }
-            auto begin() const { return data_.begin(); }
-            auto end() const { return data_.end(); }
+            // Copy constructor
+            inplace_vector(const inplace_vector& other) {
+                for (size_type i = 0; i < other.size_; ++i) {
+                    push_back(other[i]);
+                }
+            }
             
-            size_t size() const { return data_.size(); }
-            bool empty() const { return data_.empty(); }
-            void clear() { data_.clear(); }
+            // Move constructor
+            inplace_vector(inplace_vector&& other) noexcept(std::is_nothrow_move_constructible_v<T>) {
+                for (size_type i = 0; i < other.size_; ++i) {
+                    push_back(std::move(other[i]));
+                }
+                other.clear();
+            }
             
-            T& operator[](size_t i) { return data_[i]; }
-            const T& operator[](size_t i) const { return data_[i]; }
+            // Copy assignment
+            inplace_vector& operator=(const inplace_vector& other) {
+                if (this != &other) {
+                    clear();
+                    for (size_type i = 0; i < other.size_; ++i) {
+                        push_back(other[i]);
+                    }
+                }
+                return *this;
+            }
             
-            static constexpr size_t capacity() { return N; }
+            // Move assignment
+            inplace_vector& operator=(inplace_vector&& other) noexcept(std::is_nothrow_move_assignable_v<T>) {
+                if (this != &other) {
+                    clear();
+                    for (size_type i = 0; i < other.size_; ++i) {
+                        push_back(std::move(other[i]));
+                    }
+                    other.clear();
+                }
+                return *this;
+            }
+            
+            // Element access
+            reference operator[](size_type i) noexcept {
+                assert(i < size_ && "inplace_vector index out of bounds");
+                return data()[i];
+            }
+            
+            const_reference operator[](size_type i) const noexcept {
+                assert(i < size_ && "inplace_vector index out of bounds");
+                return data()[i];
+            }
+            
+            reference at(size_type i) {
+                if (i >= size_) {
+                    // In a real implementation, throw std::out_of_range
+                    assert(false && "inplace_vector::at() index out of bounds");
+                }
+                return data()[i];
+            }
+            
+            const_reference at(size_type i) const {
+                if (i >= size_) {
+                    assert(false && "inplace_vector::at() index out of bounds");
+                }
+                return data()[i];
+            }
+            
+            reference front() noexcept {
+                assert(!empty() && "inplace_vector::front() called on empty vector");
+                return data()[0];
+            }
+            
+            const_reference front() const noexcept {
+                assert(!empty() && "inplace_vector::front() called on empty vector");
+                return data()[0];
+            }
+            
+            reference back() noexcept {
+                assert(!empty() && "inplace_vector::back() called on empty vector");
+                return data()[size_ - 1];
+            }
+            
+            const_reference back() const noexcept {
+                assert(!empty() && "inplace_vector::back() called on empty vector");
+                return data()[size_ - 1];
+            }
+            
+            // Iterators
+            iterator begin() noexcept { return data(); }
+            const_iterator begin() const noexcept { return data(); }
+            const_iterator cbegin() const noexcept { return data(); }
+            
+            iterator end() noexcept { return data() + size_; }
+            const_iterator end() const noexcept { return data() + size_; }
+            const_iterator cend() const noexcept { return data() + size_; }
+            
+            // Capacity
+            bool empty() const noexcept { return size_ == 0; }
+            size_type size() const noexcept { return size_; }
+            static constexpr size_type capacity() noexcept { return N; }
+            static constexpr size_type max_size() noexcept { return N; }
+            
+            // Modifiers
+            void clear() noexcept {
+                if constexpr (!std::is_trivially_destructible_v<T>) {
+                    for (size_type i = 0; i < size_; ++i) {
+                        data()[i].~T();
+                    }
+                }
+                size_ = 0;
+            }
+            
+            void push_back(const T& value) {
+                assert(size_ < N && "inplace_vector capacity exceeded");
+                new (&storage_[size_ * sizeof(T)]) T(value);
+                ++size_;
+            }
+            
+            void push_back(T&& value) {
+                assert(size_ < N && "inplace_vector capacity exceeded");
+                new (&storage_[size_ * sizeof(T)]) T(std::move(value));
+                ++size_;
+            }
+            
+            template<typename... Args>
+            reference emplace_back(Args&&... args) {
+                assert(size_ < N && "inplace_vector capacity exceeded");
+                T* ptr = new (&storage_[size_ * sizeof(T)]) T(std::forward<Args>(args)...);
+                ++size_;
+                return *ptr;
+            }
+            
+            void pop_back() noexcept {
+                assert(!empty() && "inplace_vector::pop_back() called on empty vector");
+                --size_;
+                if constexpr (!std::is_trivially_destructible_v<T>) {
+                    data()[size_].~T();
+                }
+            }
+            
+            void resize(size_type count) {
+                assert(count <= N && "inplace_vector resize exceeds capacity");
+                if (count < size_) {
+                    // Shrink
+                    if constexpr (!std::is_trivially_destructible_v<T>) {
+                        for (size_type i = count; i < size_; ++i) {
+                            data()[i].~T();
+                        }
+                    }
+                } else if (count > size_) {
+                    // Grow with default-constructed elements
+                    for (size_type i = size_; i < count; ++i) {
+                        new (&storage_[i * sizeof(T)]) T();
+                    }
+                }
+                size_ = count;
+            }
+            
+            void resize(size_type count, const T& value) {
+                assert(count <= N && "inplace_vector resize exceeds capacity");
+                if (count < size_) {
+                    // Shrink
+                    if constexpr (!std::is_trivially_destructible_v<T>) {
+                        for (size_type i = count; i < size_; ++i) {
+                            data()[i].~T();
+                        }
+                    }
+                } else if (count > size_) {
+                    // Grow with copies of value
+                    for (size_type i = size_; i < count; ++i) {
+                        new (&storage_[i * sizeof(T)]) T(value);
+                    }
+                }
+                size_ = count;
+            }
         };
     }
 #endif
-
-// ============================================================================
-// Platform Information
-// ============================================================================
-
-namespace SecretEngine {
-    struct CPP26Support {
-        static constexpr bool hasReflection = SE_HAS_REFLECTION;
-        static constexpr bool hasContracts = SE_HAS_CONTRACTS;
-        static constexpr bool hasExecution = SE_HAS_EXECUTION;
-        static constexpr bool hasInplaceVector = SE_HAS_INPLACE_VECTOR;
-        static constexpr bool hasPackIndexing = SE_HAS_PACK_INDEXING;
-        static constexpr bool hasOptionalRef = SE_HAS_OPTIONAL_REF;
-        static constexpr bool hasDebugging = SE_HAS_DEBUGGING;
-        static constexpr bool hasSIMD = SE_HAS_SIMD;
-        static constexpr bool hasMdspan = SE_HAS_MDSPAN;
-        
-        static void PrintSupport() {
-            // Log which C++26 features are available
-            // Useful for debugging platform differences
-        }
-    };
-}
-
-// ============================================================================
-// Usage Examples
-// ============================================================================
-
-/*
-
-// Example 1: Using inplace_vector
-#include <SecretEngine/CPP26Features.h>
-
-void CullObjects() {
-    std::inplace_vector<Entity*, 1024> visible;  // Works on C++26 and C++23
-    
-    for (auto* entity : allEntities) {
-        if (IsVisible(entity)) {
-            visible.push_back(entity);
-        }
-    }
-}
-
-// Example 2: Using contracts
-void SetVelocity(const Vec3& v)
-    SE_PRECONDITION(v.Length() < MAX_VELOCITY)
-{
-    velocity = v;
-}
-
-// Example 3: Using debugging
-void CustomAssert(bool condition, const char* msg) {
-    if (!condition) {
-        LogError(msg);
-        if (SE_IS_DEBUGGER_PRESENT()) {
-            SE_BREAKPOINT();
-        }
-    }
-}
-
-// Example 4: Conditional compilation
-#if SE_HAS_REFLECTION
-    // Use static reflection
-    template<typename T>
-    void AutoSerialize(const T& obj) {
-        constexpr auto members = std::meta::members_of(^T);
-        // ...
-    }
-#else
-    // Use macro-based registration
-    #define REGISTER_COMPONENT(T) // ...
-#endif
-
-*/

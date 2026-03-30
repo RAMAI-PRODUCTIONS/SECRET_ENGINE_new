@@ -51,7 +51,11 @@ uint32_t LightManager::GetLightCount() const {
     return static_cast<uint32_t>(std::count(m_activeSlots.begin(), m_activeSlots.end(), true));
 }
 
-const void* LightManager::GetLightBuffer() const {
+std::span<const LightData> LightManager::GetLightBuffer() const {
+    return std::span<const LightData>(m_lights.data(), m_lights.size());
+}
+
+const void* LightManager::GetLightBufferRaw() const {
     return m_lights.empty() ? nullptr : m_lights.data();
 }
 

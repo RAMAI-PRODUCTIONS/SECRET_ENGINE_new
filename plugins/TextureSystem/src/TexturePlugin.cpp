@@ -70,7 +70,7 @@ SecretEngine::TextureHandle TexturePlugin::LoadTexture(const char* path) {
     return {index, m_nextGeneration++};
 }
 
-SecretEngine::TextureHandle TexturePlugin::CreateTexture(const SecretEngine::TextureDesc& desc, const void* data) {
+SecretEngine::TextureHandle TexturePlugin::CreateTexture(const SecretEngine::TextureDesc& desc, std::span<const std::byte> data) {
     uint32_t index;
     if (!m_freeSlots.empty()) {
         index = m_freeSlots.back();
@@ -90,6 +90,13 @@ SecretEngine::TextureHandle TexturePlugin::CreateTexture(const SecretEngine::Tex
     m_textures[index].isReady = true;
     
     return {index, m_nextGeneration++};
+}
+
+SecretEngine::TextureHandle TexturePlugin::CreateTextureRaw(const SecretEngine::TextureDesc& desc, const void* data) {
+    // Legacy API - convert to span and call new API
+    size_t dataSize = desc.width * desc.height * 4; // Assume RGBA8
+    std::span<const std::byte> dataSpan(reinterpret_cast<const std::byte*>(data), dataSize);
+    return CreateTexture(desc, dataSpan);
 }
 
 SecretEngine::TextureHandle TexturePlugin::LoadTextureAsync(const char* path) {
@@ -143,8 +150,8 @@ void TexturePlugin::SetStreamingDistance(float distance) {
     m_streamingDistance = distance;
 }
 
-void TexturePlugin::UpdateStreaming(const float cameraPos[3]) {
-    memcpy(m_cameraPos, cameraPos, sizeof(float) * 3);
+void TexturePlugin::UpdateStreaming(std::span<const float, 3> cameraPos) {
+    memcpy(m_cameraPos, cameraPos.data(), sizeof(float) * 3);
 }
 
 uint32_t TexturePlugin::GetLoadedTextureCount() const {

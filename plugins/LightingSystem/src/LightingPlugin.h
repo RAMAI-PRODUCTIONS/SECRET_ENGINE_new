@@ -27,7 +27,8 @@ public:
     void RemoveLight(uint32_t lightID) override;
     const SecretEngine::LightData* GetLight(uint32_t lightID) const override;
     uint32_t GetLightCount() const override;
-    const void* GetLightBuffer() const override;
+    std::span<const SecretEngine::LightData> GetLightBuffer() const override;
+    const void* GetLightBufferRaw() const override;
     size_t GetLightBufferSize() const override;
     
 private:

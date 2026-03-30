@@ -12,10 +12,6 @@ layout(location = 6) in uint packedColor;
 
 layout(location = 2) out vec4 outColor;
 
-// Lighting constants
-const vec3 LIGHT_DIR = normalize(vec3(1.0, 1.0, 1.0));
-const float AMBIENT = 0.3;
-
 layout(push_constant) uniform PushConstants {
     mat4 viewProj;
 } pc;
@@ -31,16 +27,14 @@ void main() {
 
     gl_Position = pc.viewProj * vec4(worldPos, 1.0);
     
-    // Normal Transformation
+    // Normal Transformation (for future use, but not used for lighting)
     vec3 N;
     N.x = dot(instRow0.xyz, inNormal);
     N.y = dot(instRow1.xyz, inNormal);
     N.z = dot(instRow2.xyz, inNormal);
     N = normalize(N);
 
-    float diff = max(dot(N, LIGHT_DIR), 0.0);
-    float lighting = AMBIENT + (1.0 - AMBIENT) * diff;
-    
+    // UNLIT: No lighting calculations - use raw instance color
     vec4 instanceColor = unpackUnorm4x8(packedColor);
-    outColor = vec4(instanceColor.rgb * lighting, instanceColor.a);
+    outColor = instanceColor;  // UNLIT: Direct color, no lighting multiplier
 }

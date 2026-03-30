@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstring>
 #include <algorithm>
+#include <SecretEngine/CPP26Features.h>
 
 namespace SecretEngine {
     
@@ -55,9 +56,9 @@ namespace SecretEngine {
         }
 
         // Get view-projection matrix (called by renderer)
-        const float* GetViewProjection() const { return m_viewProj; }
+        std::span<const float, 16> GetViewProjection() const { return m_viewProj; }
 
-        const float* GetPosition() const { return m_pos; }
+        std::span<const float, 3> GetPosition() const { return m_pos; }
         float GetYaw() const { return m_yaw; }
         float GetPitch() const { return m_pitch; }
 

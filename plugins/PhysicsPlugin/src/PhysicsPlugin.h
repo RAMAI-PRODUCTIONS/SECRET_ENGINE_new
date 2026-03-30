@@ -11,6 +11,7 @@
 #include <SecretEngine/Components.h>
 #include "PhysicsTypes.h"
 #include <vector>
+#include <SecretEngine/CPP26Features.h>
 
 namespace SecretEngine::Physics {
 
@@ -27,25 +28,25 @@ public:
     void OnUpdate(float dt) override;
     void* GetInterface(uint32_t id) override { return nullptr; }
     
-    // Physics API - Raycasting
-    RaycastHit Raycast(const float origin[3], const float direction[3], float maxDistance);
-    RaycastHit RaycastWithMask(const float origin[3], const float direction[3], 
+    // Physics API - Raycasting (C++26: std::span for arrays)
+    RaycastHit Raycast(std::span<const float, 3> origin, std::span<const float, 3> direction, float maxDistance);
+    RaycastHit RaycastWithMask(std::span<const float, 3> origin, std::span<const float, 3> direction, 
                                float maxDistance, uint32_t layerMask);
     
     // Physics API - Queries
-    bool CheckGround(const float position[3], float radius, float checkDistance);
-    bool OverlapSphere(const float position[3], float radius, uint32_t layerMask = CollisionLayer::All);
-    bool OverlapBox(const float position[3], const float halfExtents[3], uint32_t layerMask = CollisionLayer::All);
+    bool CheckGround(std::span<const float, 3> position, float radius, float checkDistance);
+    bool OverlapSphere(std::span<const float, 3> position, float radius, uint32_t layerMask = CollisionLayer::All);
+    bool OverlapBox(std::span<const float, 3> position, std::span<const float, 3> halfExtents, uint32_t layerMask = CollisionLayer::All);
     
     // Physics API - Forces
-    void AddForce(Entity entity, const float force[3]);
-    void AddImpulse(Entity entity, const float impulse[3]);
-    void SetVelocity(Entity entity, const float velocity[3]);
-    void AddExplosionForce(const float position[3], float force, float radius);
+    void AddForce(Entity entity, std::span<const float, 3> force);
+    void AddImpulse(Entity entity, std::span<const float, 3> impulse);
+    void SetVelocity(Entity entity, std::span<const float, 3> velocity);
+    void AddExplosionForce(std::span<const float, 3> position, float force, float radius);
     
     // Physics API - Gravity
-    void SetGravity(const float gravity[3]);
-    const float* GetGravity() const { return m_gravity; }
+    void SetGravity(std::span<const float, 3> gravity);
+    std::span<const float, 3> GetGravity() const { return m_gravity; }
     
     // Physics API - Collision filtering
     bool ShouldCollide(uint32_t layerA, uint32_t maskA, uint32_t layerB, uint32_t maskB) const;
@@ -79,13 +80,13 @@ private:
     );
     
     bool RaycastShape(
-        const float origin[3], const float direction[3],
+        std::span<const float, 3> origin, std::span<const float, 3> direction,
         const TransformComponent* transform, const PhysicsBody* body,
         float& outDistance
     );
     
     // Collision response
-    void ApplyImpulseInternal(PhysicsBody* body, const float impulse[3]);
+    void ApplyImpulseInternal(PhysicsBody* body, std::span<const float, 3> impulse);
     void ResolveCollision(
         PhysicsBody* bodyA, TransformComponent* transformA,
         PhysicsBody* bodyB, TransformComponent* transformB,
