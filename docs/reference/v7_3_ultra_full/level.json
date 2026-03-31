@@ -1,0 +1,1 @@
+{"version": "7.3", "name": "ultra_full_scale", "core": {"transform_settings": {"rotation_format": "euler", "rotation_unit": "degrees", "rotation_order": "YXZ"}}, "references": {"players": "entities/players.json", "chunks": ["chunks/chunk_0.json", "chunks/chunk_1.json", "chunks/chunk_2.json", "chunks/chunk_3.json"]}}
