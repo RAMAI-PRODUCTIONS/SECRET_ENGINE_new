@@ -9,7 +9,6 @@
 #include "VulkanDevice.h"
 #include "Window.h"
 #include "Swapchain.h"
-#include "Pipeline3D.h"
 #include "MegaGeometryRenderer.h"
 #include "TextureManager.h"
 #include "MeshRenderingSystem.h"
@@ -91,7 +90,6 @@ private:
     VkDeviceMemory m_2dVertexMemory = VK_NULL_HANDLE;
     uint32_t m_2dVertexCount = 0;
     
-    Pipeline3D* m_pipeline3D = nullptr;
     float m_rotation = 0.0f;
     
     SecretEngine::Entity m_playerStartEntity = {0, 0};

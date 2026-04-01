@@ -165,13 +165,8 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
         logger->LogInfo("VulkanRenderer", "✓ 2D text rendering pipeline enabled");
     }
 
-    // Step 11: Create 3D Rendering Pipeline
-    m_pipeline3D = new Pipeline3D();
-    if (!m_pipeline3D->Initialize(m_device, m_renderPass, m_core)) {
-        logger->LogWarning("VulkanRenderer", "3D pipeline creation failed (non-critical)");
-        delete m_pipeline3D;
-        m_pipeline3D = nullptr;
-    }
+    // Step 11: Mega Geometry System (Primary 3D Renderer)
+    logger->LogInfo("VulkanRenderer", "Initializing Mega Geometry System...");
     
     // Step 12: Initialize Texture System (bindless textures for Mega Geometry)
     m_textureManager = new SecretEngine::Textures::TextureManager();
@@ -283,11 +278,12 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
     } else {
         logger->LogInfo("VulkanRenderer", "✓ Plugin GPU buffers created");
     }
-    if (m_pipeline3D) {
-        logger->LogInfo("VulkanRenderer", "✓ 3D rendering pipeline enabled");
-        
-        // --- Populate World with Entities (Day 3.9) ---
-        if (m_core->GetWorld()) {
+    
+    // All 3D rendering now goes through MegaGeometryRenderer
+    logger->LogInfo("VulkanRenderer", "✓ Mega Geometry System is the primary 3D renderer");
+    
+    // --- Populate World with Entities (Day 3.9) ---
+    if (m_core->GetWorld()) {
             auto world = m_core->GetWorld();
             auto logger = m_core->GetLogger();
 
@@ -388,9 +384,7 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
                                         m_megaGeometry->UpdateInstanceColor(instanceID, mesh->color[0], mesh->color[1], mesh->color[2], mesh->color[3]);
                                     }
                                     
-                                    if (m_pipeline3D) {
-                                        m_pipeline3D->LoadMesh(mesh->meshPath);
-                                    }
+                                    // Mesh loading handled by MegaGeometryRenderer
                                 }
                                 world->AddComponent(e, SecretEngine::MeshComponent::TypeID, mesh);
                             }
@@ -407,7 +401,6 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
             } else {
                 logger->LogError("VulkanRenderer", "scene.json could not be loaded (empty or missing)!");
             }
-        }
     }
     
     // SUCCESS!
@@ -482,12 +475,7 @@ void RendererPlugin::OnUnload() {
         
         CleanupSwapchain();
         
-        if (m_pipeline3D) {
-            m_pipeline3D->Cleanup();
-            delete m_pipeline3D;
-            m_pipeline3D = nullptr;
-        }
-        
+        // Cleanup MegaGeometry (primary renderer)
         if (m_megaGeometry) {
             delete m_megaGeometry;
             m_megaGeometry = nullptr;
@@ -720,33 +708,16 @@ void RendererPlugin::Present() {
         if (ext.height > 0) aspect = (float)ext.width / (float)ext.height;
     }
 
-    if (m_pipeline3D) {
-        // Use unified view-projection from CameraPlugin
-        float vp[16];
-        GetCameraMatrix(vp);
-        
-        // camPos/camRot are still needed by Pipeline3D if it does some internal logic, 
-        // but we'll modify Pipeline3D to prioritize vp matrix.
-        float camPos[3] = {0, 0, 0};
-        float camRot[3] = {0, 0, 0};
-        auto* camera = m_core->GetCapability("camera");
-        if (camera) {
-            auto* cameraPlugin = static_cast<SecretEngine::CameraPlugin*>(camera);
-            auto p = cameraPlugin->GetPosition();
-            camPos[0] = p[0]; camPos[1] = p[1]; camPos[2] = p[2];
-            camRot[0] = cameraPlugin->GetPitch();
-            camRot[1] = cameraPlugin->GetYaw();
-        }
-        
-        m_pipeline3D->Render(m_commandBuffer, m_rotation, aspect, camPos, camRot, vp);
-    }
+    // Use unified view-projection from CameraPlugin
+    float vp[16];
+    GetCameraMatrix(vp);
     
-    // Draw Mega Geometry (GPU Driven)
+    // Draw Mega Geometry (GPU Driven - Primary 3D Renderer)
     if (m_megaGeometry) {
         m_megaGeometry->Render(m_commandBuffer);
     }
 
-    // Draw 2D UI overlay on top
+        // Draw 2D UI overlay on top
     DrawWelcomeText(m_commandBuffer);
     
     vkCmdEndRenderPass(m_commandBuffer);
@@ -807,9 +778,7 @@ void RendererPlugin::Present() {
 }
 
 void RendererPlugin::SetCubeColor(int colorIndex) {
-    if (m_pipeline3D) {
-        m_pipeline3D->SetCubeColor(colorIndex);
-    }
+    // Color setting now handled through MegaGeometryRenderer::UpdateInstanceColor
 }
 
 void RendererPlugin::SetDebugInfo(int slot, const char* text) {
