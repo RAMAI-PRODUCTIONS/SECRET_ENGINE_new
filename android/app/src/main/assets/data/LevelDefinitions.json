@@ -53,29 +53,29 @@
       }
     },
     {
-      "name": "OpenWorld_Zone1",
-      "path": "levels/OpenWorld_Zone1.json",
+      "name": "levelone",
+      "path": "levels/levelone.json",
       "type": "streaming",
-      "streamingMethod": "distance",
-      "streamingDistance": 2000.0,
-      "autoLoad": false,
+      "streamingMethod": "manual",
+      "autoLoad": true,
+      "blockOnLoad": true,
       "makeVisibleAfterLoad": true,
       "bounds": {
         "center": [0, 0, 0],
-        "extents": [1000, 200, 1000]
+        "extents": [100, 50, 100]
       }
     },
     {
-      "name": "OpenWorld_Zone2",
-      "path": "levels/OpenWorld_Zone2.json",
+      "name": "leveltwo",
+      "path": "levels/leveltwo.json",
       "type": "streaming",
-      "streamingMethod": "distance",
-      "streamingDistance": 2000.0,
+      "streamingMethod": "manual",
       "autoLoad": false,
+      "blockOnLoad": true,
       "makeVisibleAfterLoad": true,
       "bounds": {
-        "center": [2000, 0, 0],
-        "extents": [1000, 200, 1000]
+        "center": [0, 0, 0],
+        "extents": [100, 50, 100]
       }
     }
   ]

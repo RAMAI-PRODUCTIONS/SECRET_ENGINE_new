@@ -44,7 +44,12 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/syoyo/tinygltf.git
     GIT_TAG v2.8.21
 )
-FetchContent_MakeAvailable(json tinygltf)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 0.9.9.8
+)
+FetchContent_MakeAvailable(json tinygltf glm)
 
 # --- CORE ARCHITECTURE ---
 add_subdirectory(core)
@@ -93,6 +98,7 @@ if(ANDROID)
         LevelSystem        # NEW: Level System
         FPSGameLogic       # NEW: FPS Game Logic
         FPSUIPlugin        # NEW: FPS UI
+        glm::glm
         android 
         log
         vulkan 

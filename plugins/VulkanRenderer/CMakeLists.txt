@@ -9,6 +9,7 @@ if(ANDROID)
         src/MegaGeometryRenderer.cpp
         src/VulkanHelpers.cpp
         src/TextureManager.cpp
+        src/MeshRenderingSystem.cpp
     )
 else()
     add_library(VulkanRenderer SHARED
@@ -20,6 +21,7 @@ else()
         src/MegaGeometryRenderer.cpp
         src/VulkanHelpers.cpp
         src/TextureManager.cpp
+        src/MeshRenderingSystem.cpp
     )
 endif()
 

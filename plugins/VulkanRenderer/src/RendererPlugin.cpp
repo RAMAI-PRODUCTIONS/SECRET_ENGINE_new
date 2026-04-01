@@ -200,7 +200,8 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
         }
         
         // Instances are already handled by logic/scattering
-            
+        // NOTE: Test code for 4000 instances disabled - entities now loaded from level system
+        /*
             // Spawn 4000 Instances in a Spherical Distribution around the player
             // Target: 6M triangles (4000 instances × ~1500 tris/instance)
             std::mt19937 rng(1337); 
@@ -254,7 +255,14 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
             snprintf(msg, sizeof(msg), "✓ Instance count verification: totalInstances=%u, totalTriangles=%u", 
                 stats.totalInstances, stats.totalTriangles);
             logger->LogInfo("VulkanRenderer", msg);
+        */
         logger->LogInfo("VulkanRenderer", "✓ Mega Geometry Renderer initialized");
+    }
+    
+    // Step 13.5: Initialize Mesh Rendering System
+    if (m_megaGeometry && m_textureManager) {
+        m_meshRenderingSystem = new SecretEngine::MeshRenderingSystem(m_core, m_megaGeometry, m_textureManager);
+        logger->LogInfo("VulkanRenderer", "✓ Mesh Rendering System initialized");
     }
     
     // Step 14: Query Plugin Systems (Modular Architecture)
@@ -420,6 +428,12 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
 
 void RendererPlugin::OnUpdate(float dt) {
     m_totalTime += dt;
+    
+    // Update mesh rendering system to process new entities
+    if (m_meshRenderingSystem) {
+        m_meshRenderingSystem->Update(dt);
+    }
+    
     if (m_megaGeometry) {
         // ULTRA-FAST BATCH UPDATE - Minimize cache misses
         m_megaGeometry->BeginBatchUpdate();
@@ -477,6 +491,11 @@ void RendererPlugin::OnUnload() {
         if (m_megaGeometry) {
             delete m_megaGeometry;
             m_megaGeometry = nullptr;
+        }
+        
+        if (m_meshRenderingSystem) {
+            delete m_meshRenderingSystem;
+            m_meshRenderingSystem = nullptr;
         }
 
         if (m_textureManager) {

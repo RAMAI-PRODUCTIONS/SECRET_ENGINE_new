@@ -12,6 +12,7 @@
 #include "Pipeline3D.h"
 #include "MegaGeometryRenderer.h"
 #include "TextureManager.h"
+#include "MeshRenderingSystem.h"
 
 // Forward declaration
 namespace SecretEngine { class CameraPlugin; }
@@ -102,6 +103,7 @@ private:
     // Mega Geometry System + Texture System
     SecretEngine::MegaGeometry::MegaGeometryRenderer* m_megaGeometry = nullptr;
     SecretEngine::Textures::TextureManager* m_textureManager = nullptr;
+    SecretEngine::MeshRenderingSystem* m_meshRenderingSystem = nullptr;
     
     // Plugin Systems (Modular Architecture)
     SecretEngine::ILightingSystem* m_lightingSystem = nullptr;

@@ -1,0 +1,220 @@
+{
+  "chunk_id": "levelone_0",
+  "mesh_groups": [
+    {
+      "mesh": "cube.meshbin",
+      "material": "ground.mat",
+      "instances": [
+        {
+          "transform": {
+            "position": [0, -1, 0],
+            "rotation": [0, 0, 0],
+            "scale": [100, 1, 100]
+          },
+          "tags": {
+            "type": "ground",
+            "name": "ground_plane"
+          },
+          "material_params": {
+            "color": [0.3, 0.5, 0.3]
+          },
+          "culling": {
+            "radius": 100.0
+          }
+        }
+      ]
+    },
+    {
+      "mesh": "Character.meshbin",
+      "material": "default.mat",
+      "instances": [
+        {
+          "transform": {
+            "position": [15, 0, 10],
+            "rotation": [0, 45, 0],
+            "scale": [5, 5, 5]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "object_1"
+          },
+          "material_params": {
+            "color": [0.8, 0.2, 0.2]
+          },
+          "culling": {
+            "radius": 5.0
+          },
+          "lod": {
+            "levels": [
+              {"distance": 25},
+              {"distance": 75},
+              {"distance": 150}
+            ]
+          }
+        },
+        {
+          "transform": {
+            "position": [-20, 0, 15],
+            "rotation": [0, 120, 0],
+            "scale": [5, 5, 5]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "object_2"
+          },
+          "material_params": {
+            "color": [0.2, 0.8, 0.2]
+          },
+          "culling": {
+            "radius": 5.0
+          },
+          "lod": {
+            "levels": [
+              {"distance": 25},
+              {"distance": 75},
+              {"distance": 150}
+            ]
+          }
+        },
+        {
+          "transform": {
+            "position": [25, 0, -18],
+            "rotation": [0, 270, 0],
+            "scale": [5, 5, 5]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "object_3"
+          },
+          "material_params": {
+            "color": [0.2, 0.2, 0.8]
+          },
+          "culling": {
+            "radius": 5.0
+          },
+          "lod": {
+            "levels": [
+              {"distance": 25},
+              {"distance": 75},
+              {"distance": 150}
+            ]
+          }
+        },
+        {
+          "transform": {
+            "position": [-15, 0, -25],
+            "rotation": [0, 180, 0],
+            "scale": [5, 5, 5]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "object_4"
+          },
+          "material_params": {
+            "color": [0.8, 0.8, 0.2]
+          },
+          "culling": {
+            "radius": 5.0
+          },
+          "lod": {
+            "levels": [
+              {"distance": 25},
+              {"distance": 75},
+              {"distance": 150}
+            ]
+          }
+        },
+        {
+          "transform": {
+            "position": [0, 0, 30],
+            "rotation": [0, 90, 0],
+            "scale": [5, 5, 5]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "object_5"
+          },
+          "material_params": {
+            "color": [0.8, 0.2, 0.8]
+          },
+          "culling": {
+            "radius": 5.0
+          },
+          "lod": {
+            "levels": [
+              {"distance": 25},
+              {"distance": 75},
+              {"distance": 150}
+            ]
+          }
+        },
+        {
+          "transform": {
+            "position": [35, 0, 5],
+            "rotation": [0, 315, 0],
+            "scale": [5, 5, 5]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "object_6"
+          },
+          "material_params": {
+            "color": [0.2, 0.8, 0.8]
+          },
+          "culling": {
+            "radius": 5.0
+          },
+          "lod": {
+            "levels": [
+              {"distance": 25},
+              {"distance": 75},
+              {"distance": 150}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mesh": "cube.meshbin",
+      "material": "trigger.mat",
+      "instances": [
+        {
+          "transform": {
+            "position": [40, 5, 0],
+            "rotation": [0, 0, 0],
+            "scale": [3, 10, 3]
+          },
+          "tags": {
+            "type": "trigger",
+            "name": "level_switch_trigger",
+            "target_level": "leveltwo"
+          },
+          "material_params": {
+            "color": [1.0, 1.0, 0.0]
+          },
+          "culling": {
+            "radius": 10.0
+          }
+        }
+      ]
+    }
+  ],
+  "triggers": [
+    {
+      "id": "switch_to_leveltwo",
+      "type": "area",
+      "shape": "box",
+      "position": [40, 5, 0],
+      "radius": 5.0,
+      "enter_actions": [
+        {
+          "type": "load_level",
+          "target_level": "leveltwo",
+          "delay": 0.5
+        }
+      ],
+      "repeatable": false,
+      "cooldown": 0.0
+    }
+  ]
+}

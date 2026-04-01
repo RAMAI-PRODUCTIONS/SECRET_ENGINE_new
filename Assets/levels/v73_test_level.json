@@ -1,0 +1,23 @@
+{
+  "version": "7.3",
+  "name": "v73_test_level",
+  "core": {
+    "transform_settings": {
+      "rotation_format": "euler",
+      "rotation_unit": "degrees",
+      "rotation_order": "YXZ"
+    }
+  },
+  "references": {
+    "players": "entities/test_players.json",
+    "chunks": [
+      "chunks/test_chunk_0.json"
+    ]
+  },
+  "streaming": {
+    "chunk_size": 100.0,
+    "load_radius": 2,
+    "unload_radius": 3,
+    "method": "distance"
+  }
+}

@@ -60,6 +60,12 @@ bool LevelLoader::LoadLevelFromFile(const char* levelPath, Level* level) {
         return LoadSceneFormat(levelPath, level);
     }
     
+    // Check if it's v7.3 level format (has references section)
+    if (json.contains("references") || json.contains("version")) {
+        m_logger->LogInfo("LevelLoader", "📦 Detected v7.3 level format");
+        return LoadV73LevelFormat(json, levelPath, level);
+    }
+    
     // TODO: Implement custom level format
     m_logger->LogWarning("LevelLoader", "⚠️ Custom level format not yet implemented");
     return false;
@@ -224,3 +230,121 @@ bool LevelLoader::SaveLevelToFile(const char* levelPath, const Level* level) {
 }
 
 } // namespace SecretEngine::Levels
+
+
+bool SecretEngine::Levels::LevelLoader::LoadV73LevelFormat(const nlohmann::json& json, const char* levelPath, Level* level) {
+    auto assetProvider = m_core->GetAssetProvider();
+    if (!assetProvider) {
+        m_logger->LogError("LevelLoader", "AssetProvider not available");
+        return false;
+    }
+    
+    char msg[256];
+    int entityCount = 0;
+    
+    // Check if it has references section (v7.3 format)
+    if (json.contains("references")) {
+        const auto& refs = json["references"];
+        
+        // Load players from references
+        if (refs.contains("players") && refs["players"].is_string()) {
+            std::string playersFile = refs["players"].get<std::string>();
+            // Prepend "levels/" if not already there
+            if (playersFile.find("levels/") == std::string::npos) {
+                playersFile = "levels/" + playersFile;
+            }
+            
+            snprintf(msg, sizeof(msg), "Loading players from: %s", playersFile.c_str());
+            m_logger->LogInfo("LevelLoader", msg);
+            
+            std::string playersJson = assetProvider->LoadText(playersFile.c_str());
+            if (!playersJson.empty()) {
+                try {
+                    nlohmann::json playersData = nlohmann::json::parse(playersJson);
+                    if (playersData.contains("players") && playersData["players"].is_array()) {
+                        for (const auto& playerData : playersData["players"]) {
+                            Entity e = ParseEntity(playerData, level);
+                            if (e.id != Entity::Invalid.id) {
+                                level->AddEntity(e.id);
+                                entityCount++;
+                            }
+                        }
+                    }
+                } catch (const std::exception& e) {
+                    snprintf(msg, sizeof(msg), "Failed to parse players file: %s", e.what());
+                    m_logger->LogError("LevelLoader", msg);
+                }
+            }
+        }
+        
+        // Load chunks from references
+        if (refs.contains("chunks") && refs["chunks"].is_array()) {
+            for (const auto& chunkFile : refs["chunks"]) {
+                if (chunkFile.is_string()) {
+                    std::string chunkPath = chunkFile.get<std::string>();
+                    // Prepend "levels/" if not already there
+                    if (chunkPath.find("levels/") == std::string::npos) {
+                        chunkPath = "levels/" + chunkPath;
+                    }
+                    
+                    snprintf(msg, sizeof(msg), "Loading chunk from: %s", chunkPath.c_str());
+                    m_logger->LogInfo("LevelLoader", msg);
+                    
+                    std::string chunkJson = assetProvider->LoadText(chunkPath.c_str());
+                    if (!chunkJson.empty()) {
+                        try {
+                            nlohmann::json chunkData = nlohmann::json::parse(chunkJson);
+                            
+                            // Handle mesh_groups format (v7.3)
+                            if (chunkData.contains("mesh_groups") && chunkData["mesh_groups"].is_array()) {
+                                for (const auto& meshGroup : chunkData["mesh_groups"]) {
+                                    if (meshGroup.contains("instances") && meshGroup["instances"].is_array()) {
+                                        for (const auto& instance : meshGroup["instances"]) {
+                                            // Create entity data in the format ParseEntity expects
+                                            nlohmann::json entityData;
+                                            if (instance.contains("transform")) {
+                                                entityData["transform"] = instance["transform"];
+                                            }
+                                            if (meshGroup.contains("mesh")) {
+                                                entityData["mesh"] = {
+                                                    {"path", meshGroup["mesh"].get<std::string>()}
+                                                };
+                                            }
+                                            if (instance.contains("tags") && instance["tags"].contains("name")) {
+                                                entityData["name"] = instance["tags"]["name"];
+                                            }
+                                            
+                                            Entity e = ParseEntity(entityData, level);
+                                            if (e.id != Entity::Invalid.id) {
+                                                level->AddEntity(e.id);
+                                                entityCount++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // Handle old meshes format (fallback)
+                            else if (chunkData.contains("meshes") && chunkData["meshes"].is_array()) {
+                                for (const auto& meshData : chunkData["meshes"]) {
+                                    Entity e = ParseEntity(meshData, level);
+                                    if (e.id != Entity::Invalid.id) {
+                                        level->AddEntity(e.id);
+                                        entityCount++;
+                                    }
+                                }
+                            }
+                        } catch (const std::exception& e) {
+                            snprintf(msg, sizeof(msg), "Failed to parse chunk file: %s", e.what());
+                            m_logger->LogError("LevelLoader", msg);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    snprintf(msg, sizeof(msg), "Loaded %d entities from v7.3 level", entityCount);
+    m_logger->LogInfo("LevelLoader", msg);
+    
+    return entityCount > 0;
+}

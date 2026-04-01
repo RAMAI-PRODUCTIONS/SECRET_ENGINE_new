@@ -23,6 +23,9 @@ public:
     // Load scene.json format (for compatibility)
     bool LoadSceneFormat(const char* scenePath, Level* level);
     
+    // Load v7.3 level format
+    bool LoadV73LevelFormat(const nlohmann::json& json, const char* levelPath, Level* level);
+    
     // Save level to JSON file
     bool SaveLevelToFile(const char* levelPath, const Level* level);
     
