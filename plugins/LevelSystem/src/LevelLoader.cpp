@@ -302,16 +302,71 @@ bool SecretEngine::Levels::LevelLoader::LoadV73LevelFormat(const nlohmann::json&
                                         for (const auto& instance : meshGroup["instances"]) {
                                             // Create entity data in the format ParseEntity expects
                                             nlohmann::json entityData;
+                                            
+                                            // Copy transform
                                             if (instance.contains("transform")) {
                                                 entityData["transform"] = instance["transform"];
                                             }
+                                            
+                                            // Copy mesh data from group and instance
                                             if (meshGroup.contains("mesh")) {
-                                                entityData["mesh"] = {
-                                                    {"path", meshGroup["mesh"].get<std::string>()}
-                                                };
+                                                nlohmann::json meshData;
+                                                meshData["path"] = meshGroup["mesh"].get<std::string>();
+                                                
+                                                // Copy material from group if present
+                                                if (meshGroup.contains("material")) {
+                                                    meshData["material"] = meshGroup["material"];
+                                                }
+                                                
+                                                // Copy material_params.color to mesh.color
+                                                if (instance.contains("material_params")) {
+                                                    const auto& matParams = instance["material_params"];
+                                                    if (matParams.contains("color") && matParams["color"].is_array()) {
+                                                        meshData["color"] = matParams["color"];
+                                                    }
+                                                    // Store full material_params for future use
+                                                    meshData["material_params"] = matParams;
+                                                }
+                                                
+                                                // Copy texture if present in instance
+                                                if (instance.contains("texture")) {
+                                                    meshData["texture"] = instance["texture"];
+                                                }
+                                                
+                                                entityData["mesh"] = meshData;
                                             }
-                                            if (instance.contains("tags") && instance["tags"].contains("name")) {
-                                                entityData["name"] = instance["tags"]["name"];
+                                            
+                                            // Copy tags
+                                            if (instance.contains("tags")) {
+                                                const auto& tags = instance["tags"];
+                                                if (tags.contains("name")) {
+                                                    entityData["name"] = tags["name"];
+                                                }
+                                                if (tags.contains("type")) {
+                                                    entityData["type"] = tags["type"];
+                                                }
+                                                // Store full tags for future use
+                                                entityData["tags"] = tags;
+                                            }
+                                            
+                                            // Copy culling data
+                                            if (instance.contains("culling")) {
+                                                entityData["culling"] = instance["culling"];
+                                            }
+                                            
+                                            // Copy LOD data
+                                            if (instance.contains("lod")) {
+                                                entityData["lod"] = instance["lod"];
+                                            }
+                                            
+                                            // Copy physics data if present
+                                            if (instance.contains("physics")) {
+                                                entityData["physics"] = instance["physics"];
+                                            }
+                                            
+                                            // Copy any custom data
+                                            if (instance.contains("custom_data")) {
+                                                entityData["custom_data"] = instance["custom_data"];
                                             }
                                             
                                             Entity e = ParseEntity(entityData, level);

@@ -65,7 +65,15 @@ void MeshRenderingSystem::ProcessNewEntities() {
         if (instanceID < 65536) { // Valid instance
             m_entityToInstanceMap[entityId] = instanceID;
             
-            // Update full transform (position + rotation)
+            // Set color from mesh component FIRST (before transform)
+            m_megaGeometry->UpdateInstanceColor(instanceID,
+                meshComp->color[0],
+                meshComp->color[1],
+                meshComp->color[2],
+                meshComp->color[3]
+            );
+            
+            // Update full transform (position + rotation) AFTER color
             m_megaGeometry->UpdateInstanceTransform(instanceID, 
                 transformComp->position[0],
                 transformComp->position[1],
@@ -75,17 +83,10 @@ void MeshRenderingSystem::ProcessNewEntities() {
                 transformComp->rotation[2]  // rotZ
             );
             
-            // Set color from mesh component
-            m_megaGeometry->UpdateInstanceColor(instanceID,
-                meshComp->color[0],
-                meshComp->color[1],
-                meshComp->color[2],
-                meshComp->color[3]
-            );
-            
             char msg[256];
-            snprintf(msg, sizeof(msg), "Added entity %u to renderer as instance %u at (%.1f, %.1f, %.1f)",
-                entityId, instanceID, transformComp->position[0], transformComp->position[1], transformComp->position[2]);
+            snprintf(msg, sizeof(msg), "Added entity %u to renderer as instance %u at (%.1f, %.1f, %.1f) color(%.2f, %.2f, %.2f, %.2f)",
+                entityId, instanceID, transformComp->position[0], transformComp->position[1], transformComp->position[2],
+                meshComp->color[0], meshComp->color[1], meshComp->color[2], meshComp->color[3]);
             m_logger->LogInfo("MeshRenderingSystem", msg);
         }
     }
