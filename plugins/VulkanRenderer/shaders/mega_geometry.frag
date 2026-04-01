@@ -16,7 +16,10 @@ void main() {
     // Sample texture
     vec4 albedo = texture(diffuseTexture, fragTexCoord);
     
-    // Multiply texture by per-instance color
-    // Simple and fast - preserves texture detail with color tint
-    outColor = albedo * fragColor;
+    // Mix texture with per-instance color (50/50 blend)
+    // This keeps both texture detail and color visible
+    outColor = mix(albedo, fragColor, 0.5);
+    
+    // Alternative: Add color to texture (brightens)
+    // outColor = albedo + fragColor * 0.5;
 }

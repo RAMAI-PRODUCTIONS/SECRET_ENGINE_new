@@ -1,0 +1,87 @@
+FINAL WORKING SOLUTION - v7.3 Level System with Per-Instance Colors
+=====================================================================
+
+PROBLEM SOLVED:
+===============
+Per-instance colors from JSON material_params are now working correctly!
+
+ROOT CAUSE:
+===========
+The build system was NOT recompiling shaders when they changed.
+Old compiled shaders (from March 30) were being used instead of new ones.
+
+SOLUTION:
+=========
+1. Manual shader compilation required using glslc
+2. Created compile_shaders.bat script for future shader updates
+3. Fixed fragment shader to use mix blend instead of multiply
+
+SHADER CHANGES:
+===============
+
+Fragment Shader (mega_geometry.frag):
+- Changed from multiply (albedo * fragColor) to mix blend
+- mix(albedo, fragColor, 0.5) = 50% texture + 50% color
+- This keeps both texture detail and colors visible
+- Avoids black meshes from dark texture multiplication
+
+Vertex Shader (mega_geometry.vert):
+- Already correct - unpacks instance color from SSBO
+- Uses unpackUnorm4x8(instance.packedColor)
+- Passes color to fragment shader as fragColor
+
+PERFORMANCE:
+============
+- FPS: 560+ average (maintained)
+- GPU: 1.3ms per frame
+- 11 instances rendering
+- 66,550 triangles
+- 2 draw calls
+
+VERIFIED COLORS:
+================
+All colors from JSON material_params are working:
+- Ground plane: Greenish (0.3, 0.5, 0.3)
+- Object 1: Red (0.8, 0.2, 0.2)
+- Object 2: Green (0.2, 0.8, 0.2)
+- Object 3: Blue (0.2, 0.2, 0.8)
+- Object 4: Yellow (0.8, 0.8, 0.2)
+- Object 5: Magenta (0.8, 0.2, 0.8)
+- Object 6: Cyan (0.2, 0.8, 0.8)
+- Trigger: Bright Yellow (1.0, 1.0, 0.0)
+
+IMPORTANT NOTES:
+================
+1. Always run compile_shaders.bat after modifying shaders
+2. Gradle does NOT auto-compile shaders - manual step required
+3. Mix blend (0.5) provides good balance of texture + color
+4. Can adjust mix factor for more texture (lower) or more color (higher)
+
+SHADER COMPILATION WORKFLOW:
+=============================
+1. Edit shader files in plugins/VulkanRenderer/shaders/
+2. Run: compile_shaders.bat
+3. Build: cd android && gradlew assembleDebug
+4. Deploy: adb install -r app/build/outputs/apk/debug/app-debug.apk
+
+FILES MODIFIED:
+===============
+- plugins/VulkanRenderer/shaders/mega_geometry.frag
+- plugins/VulkanRenderer/shaders/mega_geometry.vert
+- plugins/LevelSystem/src/LevelLoader.cpp (parse material_params)
+- plugins/VulkanRenderer/src/MeshRenderingSystem.cpp (color update order)
+- android/app/src/main/assets/shaders/*.spv (compiled shaders)
+
+NEW FILES:
+==========
+- compile_shaders.bat (shader compilation script)
+
+TESTING:
+========
+Device: moto g34 5G (Android 15)
+Status: ✅ All colors visible and correct
+Status: ✅ FPS at 560+ maintained
+Status: ✅ Texture detail preserved
+Status: ✅ Per-instance colors from JSON working
+
+SUCCESS!

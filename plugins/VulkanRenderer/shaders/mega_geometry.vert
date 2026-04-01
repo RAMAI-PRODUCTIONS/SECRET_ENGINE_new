@@ -76,6 +76,6 @@ void main() {
     // Output to fragment shader
     fragTexCoord = inTexCoord;
     fragNormal = N;
-    fragColor = instanceColor;  // UNLIT: Direct color, no lighting multiplier
+    fragColor = instanceColor;  // Use actual instance color from JSON
     fragTextureID = instance.textureID;
 }
