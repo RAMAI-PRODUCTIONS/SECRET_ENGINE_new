@@ -13,24 +13,13 @@ layout(set = 1, binding = 1) uniform sampler2D normalTexture;
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    // STEP 1: Test if shader is running - output RED
-    // outColor = vec4(1.0, 0.0, 0.0, 1.0);
-    
-    // STEP 2: Test UV coordinates - should show gradient
-    // outColor = vec4(fragTexCoord.x, fragTexCoord.y, 0.0, 1.0);
-    
-    // STEP 3: Test texture sampling
+    // Sample texture
     vec4 albedo = texture(diffuseTexture, fragTexCoord);
     
-    // If texture is white (1,1,1), show MAGENTA to indicate problem
-    if (albedo.r > 0.99 && albedo.g > 0.99 && albedo.b > 0.99) {
-        outColor = vec4(1.0, 0.0, 1.0, 1.0); // MAGENTA = texture is white
-    } else {
-        outColor = albedo; // Show actual texture color
-    }
+    // Multiply texture by per-instance color (from material_params in JSON)
+    // This allows each instance to have a unique color tint
+    outColor = albedo * fragColor;
     
-    // STEP 4: Test if texture is completely black
-    if (albedo.r < 0.01 && albedo.g < 0.01 && albedo.b < 0.01) {
-        outColor = vec4(0.0, 1.0, 1.0, 1.0); // CYAN = texture is black
-    }
+    // Ensure alpha is 1.0 for opaque rendering
+    outColor.a = 1.0;
 }
