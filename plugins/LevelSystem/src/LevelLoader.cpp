@@ -282,9 +282,14 @@ bool SecretEngine::Levels::LevelLoader::LoadV73LevelFormat(const nlohmann::json&
             for (const auto& chunkFile : refs["chunks"]) {
                 if (chunkFile.is_string()) {
                     std::string chunkPath = chunkFile.get<std::string>();
-                    // Prepend "levels/" if not already there
-                    if (chunkPath.find("levels/") == std::string::npos) {
-                        chunkPath = "levels/" + chunkPath;
+                    
+                    // Make path relative to level file directory
+                    // Extract directory from levelPath
+                    std::string levelDir = levelPath;
+                    size_t lastSlash = levelDir.find_last_of('/');
+                    if (lastSlash != std::string::npos) {
+                        levelDir = levelDir.substr(0, lastSlash + 1);
+                        chunkPath = levelDir + chunkPath;
                     }
                     
                     snprintf(msg, sizeof(msg), "Loading chunk from: %s", chunkPath.c_str());
