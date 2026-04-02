@@ -1,0 +1,207 @@
+// vertex_merge_v4.comp — Ultra-optimized SIMD vertex GI merging
+// Target: 2400 FPS (0.416ms/frame) on Snapdragon 8 Gen 3
+// Strategy: 64-thread workgroup, 8-wide SIMD, 24-byte compact light vertices
+
+#version 450
+#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require
+#extension GL_EXT_shader_explicit_arithmetic_types_int8  : require
+#extension GL_EXT_shader_16bit_storage : require
+#extension GL_EXT_shader_8bit_storage  : require
+#extension GL_KHR_shader_subgroup_arithmetic : require
+
+layout(local_size_x = 64) in;
+
+// ── Compact Light Vertex (24 bytes) ─────────────────────────────────────
+struct LightVertexCompact {
+    uint16_t posX, posY, posZ;      // Quantized position (16cm precision)
+    uint8_t  r, g, b, e;            // RGBE throughput (shared exponent)
+    uint16_t packedNormal;          // Octahedral encoding
+    uint16_t lightIndexFlags;       // 12-bit index + 4-bit flags
+    uint16_t radiusMM;              // Radius in millimeters
+    uint16_t packedPdf;             // 8-bit conn + 8-bit merge PDF
+};
+
+// ── Mesh Vertex (40 bytes) ──────────────────────────────────────────────
+struct GPUVertex {
+    vec3  position; float _p0;
+    vec3  normal;   float _p1;
+    vec2  texCoord;
+    uint  vertexLight;
+    uint  packedTangent;
+};
+
+// ── Shared Memory Cache (64 LVs × 24B = 1536 bytes) ────────────────────
+shared LightVertexCompact sLV[64];
+shared vec3 sLVPos[64];         // Dequantized positions (cache for reuse)
+shared vec3 sLVTput[64];        // Decoded RGBE throughput
+
+// ── Bindings ────────────────────────────────────────────────────────────
+layout(set=0, binding=0) buffer   MeshVerts  { GPUVertex mv[]; };
+layout(set=0, binding=1) readonly buffer LightVerts { LightVertexCompact lv[]; };
+layout(set=0, binding=2) buffer   OutLight   { uint outLight[]; };
+
+layout(push_constant) uniform PC {
+    uint  meshVertOffset;
+    uint  meshVertCount;
+    uint  lightVertCount;
+    float globalMergeR;
+    float giIntensity;
+    uint  totalMeshVerts;
+    float posQuantScale;        // 1.0 / 16cm = 6.25
+    float posQuantOriginX;
+    float posQuantOriginY;
+    float posQuantOriginZ;
+} pc;
+
+// ── SIMD Configuration ──────────────────────────────────────────────────
+const uint SIMD_WIDTH = 8;      // Process 8 light vertices per thread
+const uint TILE_SIZE  = 64;     // Shared memory cache size
+
+// ── Decode Helpers ──────────────────────────────────────────────────────
+
+vec3 dequantizePosition(uint16_t x, uint16_t y, uint16_t z) {
+    return vec3(
+        float(x) / pc.posQuantScale + pc.posQuantOriginX,
+        float(y) / pc.posQuantScale + pc.posQuantOriginY,
+        float(z) / pc.posQuantScale + pc.posQuantOriginZ
+    );
+}
+
+vec3 decodeRGBE(uint8_t r, uint8_t g, uint8_t b, uint8_t e) {
+    if (e == 0u) return vec3(0.0);
+    float scale = exp2(float(int(e) - 128));
+    return vec3(float(r), float(g), float(b)) * (scale / 255.0);
+}
+
+vec3 decodeNormal(uint16_t packed) {
+    float x = float(packed & 0xFFu) / 255.0 * 2.0 - 1.0;
+    float y = float(packed >> 8)    / 255.0 * 2.0 - 1.0;
+    vec3 n  = vec3(x, y, 1.0 - abs(x) - abs(y));
+    if (n.z < 0.0) n.xy = (1.0 - abs(n.yx)) * sign(n.xy);
+    return normalize(n);
+}
+
+float decodeRadius(uint16_t radiusMM) {
+    return float(radiusMM) * 0.001;  // mm → meters
+}
+
+vec2 decodePdf(uint16_t packed) {
+    return vec2(
+        float(uint(packed) & 0xFFu) / 255.0,
+        float(uint(packed) >> 8)    / 255.0
+    );
+}
+
+uint packR11G11B10(vec3 v) {
+    return uint(clamp(v.r, 0.0, 1.0) * 2047.0 + 0.5)
+         | (uint(clamp(v.g, 0.0, 1.0) * 2047.0 + 0.5) << 11)
+         | (uint(clamp(v.b, 0.0, 1.0) * 1023.0 + 0.5) << 22);
+}
+
+vec3 unpackR11G11B10(uint p) {
+    return vec3(
+        float( p        & 0x7FFu) / 2047.0,
+        float((p >> 11) & 0x7FFu) / 2047.0,
+        float((p >> 22) & 0x3FFu) / 1023.0
+    );
+}
+
+// ── Main ────────────────────────────────────────────────────────────────
+void main() {
+    uint lid  = gl_LocalInvocationID.x;
+    uint gid  = gl_GlobalInvocationID.x;
+    uint vIdx = pc.meshVertOffset + gid;
+    
+    if (vIdx >= pc.totalMeshVerts) return;
+    
+    // Load mesh vertex
+    GPUVertex vert = mv[vIdx];
+    vec3 vPos  = vert.position;
+    vec3 vNorm = normalize(vert.normal);
+    
+    // SIMD accumulator: 8 lanes per thread
+    vec3 indirect[SIMD_WIDTH];
+    float totalW[SIMD_WIDTH];
+    for (uint s = 0; s < SIMD_WIDTH; ++s) {
+        indirect[s] = vec3(0.0);
+        totalW[s]   = 0.0;
+    }
+    
+    // Process light vertices in tiles of 64
+    uint lvTiles = (pc.lightVertCount + TILE_SIZE - 1) / TILE_SIZE;
+    
+    for (uint tile = 0; tile < lvTiles; ++tile) {
+        
+        // ── Cooperative Load into Shared Memory ────────────────────────
+        uint lvIdx = tile * TILE_SIZE + lid;
+        if (lvIdx < pc.lightVertCount) {
+            LightVertexCompact src = lv[lvIdx];
+            sLV[lid] = src;
+            
+            // Decode once, cache for all threads
+            sLVPos[lid]  = dequantizePosition(src.posX, src.posY, src.posZ);
+            sLVTput[lid] = decodeRGBE(src.r, src.g, src.b, src.e);
+        } else {
+            // Invalid sentinel
+            sLV[lid].lightIndexFlags = 0xFFFFu;
+        }
+        
+        barrier();
+        
+        // ── SIMD Processing Loop (8 light vertices per thread) ─────────
+        for (uint s = 0; s < SIMD_WIDTH; ++s) {
+            uint j = lid * SIMD_WIDTH + s;
+            if (j >= TILE_SIZE) continue;
+            
+            // Early-out: invalid or specular
+            uint flags = uint(sLV[j].lightIndexFlags) & 0xFu;
+            if (flags == 0xFu) continue;        // Invalid
+            if ((flags & 0x1u) != 0u) continue; // Specular
+            
+            vec3 lvPos = sLVPos[j];
+            float dist = length(lvPos - vPos);
+            
+            float r = min(decodeRadius(sLV[j].radiusMM), pc.globalMergeR);
+            if (dist >= r) continue;
+            
+            // Gaussian kernel
+            float rr     = r * r;
+            float kernel = exp(-(dist * dist) / rr);
+            
+            // Cosine term
+            vec3  toL   = normalize(lvPos - vPos);
+            float NdotL = max(dot(vNorm, toL), 0.0);
+            
+            // MIS weight (balance heuristic)
+            vec2 pdf    = decodePdf(sLV[j].packedPdf);
+            float denom = pdf.x + pdf.y;
+            float weight = pdf.y / max(denom, 1e-6);
+            
+            // Accumulate
+            vec3 contrib = sLVTput[j] * (kernel * NdotL * weight);
+            indirect[s] += contrib;
+            totalW[s]   += weight;
+        }
+        
+        barrier();
+    }
+    
+    // ── Horizontal Sum Across SIMD Lanes ────────────────────────────────
+    vec3 finalIndirect = vec3(0.0);
+    float finalWeight  = 0.0;
+    
+    for (uint s = 0; s < SIMD_WIDTH; ++s) {
+        finalIndirect += indirect[s];
+        finalWeight   += totalW[s];
+    }
+    
+    if (finalWeight > 1e-6) {
+        finalIndirect /= finalWeight;
+    }
+    
+    // ── Combine with Direct Lighting ────────────────────────────────────
+    vec3 direct = unpackR11G11B10(outLight[vIdx]);
+    vec3 total  = direct + finalIndirect * pc.giIntensity;
+    
+    outLight[vIdx] = packR11G11B10(total);
+}
