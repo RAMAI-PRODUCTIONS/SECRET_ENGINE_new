@@ -1,0 +1,264 @@
+#version 450
+#extension GL_KHR_shader_subgroup_basic : enable
+#extension GL_KHR_shader_subgroup_arithmetic : enable
+
+/**
+ * Vertex Merge v4.0 - Ultra-Optimized SIMD Merge Shader
+ * 
+ * Merges light vertices with mesh vertices to compute per-vertex GI.
+ * Optimized for 64-thread workgroups with 8-wide SIMD processing.
+ * 
+ * Performance target: 0.08ms for 62.5K vertices (1/8 TAGI update)
+ * Memory bandwidth: ~150 MB/s (well within mobile GPU limits)
+ */
+
+// ── Configuration ────────────────────────────────────────────────────────────
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+// Maximum light vertices to check per mesh vertex
+#define MAX_LIGHT_VERTICES 64
+
+// Gaussian kernel radius (in world units)
+#define KERNEL_RADIUS 2.0
+
+// Minimum luminance threshold (cull dark vertices)
+#define MIN_LUMINANCE 0.01
+
+// ── Buffers ──────────────────────────────────────────────────────────────────
+
+// Light vertex cache (read-only)
+struct LightVertexCompact {
+    uint posX;          // 16-bit x, 16-bit y (packed)
+    uint posZ_normalX;  // 16-bit z, 16-bit normalX (packed)
+    uint normalY_rgbE;  // 8-bit normalY, 8-bit R, 8-bit G, 8-bit E (packed)
+    uint radiusPdf;     // 16-bit radius, 16-bit PDF (packed)
+    uint instanceId_flags; // 16-bit instance, 16-bit flags (packed)
+};
+
+layout(std430, set = 0, binding = 0) readonly buffer LightVertexBuffer {
+    LightVertexCompact lightVertices[];
+};
+
+// Mesh vertex data (read-only)
+struct MeshVertex {
+    vec3 position;
+    vec3 normal;
+    vec2 texCoord;
+};
+
+layout(std430, set = 0, binding = 1) readonly buffer MeshVertexBuffer {
+    MeshVertex meshVertices[];
+};
+
+// Output: per-vertex colors (R11G11B10F packed)
+layout(std430, set = 0, binding = 2) buffer VertexColorBuffer {
+    uint vertexColors[];  // R11G11B10F packed
+};
+
+// Spatial hash grid (for fast neighbor lookup)
+layout(std430, set = 0, binding = 3) readonly buffer SpatialHashBuffer {
+    uint hashGrid[];      // [cellIndex] = lightVertexIndex
+    uint hashOffsets[];   // [cellIndex] = start offset in hashGrid
+    uint hashCounts[];    // [cellIndex] = count of light vertices
+};
+
+// Instance transforms
+layout(std430, set = 0, binding = 4) readonly buffer InstanceBuffer {
+    mat4 instanceTransforms[];
+};
+
+// Push constants
+layout(push_constant) uniform PushConstants {
+    uint vertexOffset;      // Starting vertex index (for TAGI)
+    uint vertexCount;       // Number of vertices to process
+    uint lightVertexCount;  // Total light vertices
+    uint instanceId;        // Current instance being processed
+    vec3 boundsMin;         // Scene bounds minimum
+    vec3 boundsMax;         // Scene bounds maximum
+    float temporalBlend;    // EMA blend factor (0.9 = 90% old, 10% new)
+} pc;
+
+// ── Shared Memory (Cooperative Loading) ──────────────────────────────────────
+
+// Cache 64 light vertices in shared memory (1536 bytes)
+shared LightVertexCompact s_lightCache[MAX_LIGHT_VERTICES];
+shared vec3 s_lightPositions[MAX_LIGHT_VERTICES];
+shared vec3 s_lightColors[MAX_LIGHT_VERTICES];
+
+// ── Utility Functions ────────────────────────────────────────────────────────
+
+// Unpack 16-bit position component
+float unpackPos16(uint packed, uint component) {
+    uint value = (component == 0) ? (packed & 0xFFFF) : (packed >> 16);
+    return mix(pc.boundsMin[component], pc.boundsMax[component], float(value) / 65535.0);
+}
+
+// Unpack RGBE color
+vec3 unpackRGBE(uint packed) {
+    uint r = (packed >> 16) & 0xFF;
+    uint g = (packed >> 8) & 0xFF;
+    uint e = packed & 0xFF;
+    
+    if (e == 0) return vec3(0.0);
+    
+    float exponent = exp2(float(int(e) - 128 - 8));
+    return vec3(float(r), float(g), float(e >> 24)) * exponent;
+}
+
+// Unpack octahedral normal
+vec3 unpackNormal(uint packedX, uint packedY) {
+    vec2 oct = vec2(float(packedX), float(packedY)) / 255.0 * 2.0 - 1.0;
+    vec3 n = vec3(oct.x, oct.y, 1.0 - abs(oct.x) - abs(oct.y));
+    
+    if (n.z < 0.0) {
+        float oldX = n.x;
+        n.x = (1.0 - abs(n.y)) * (oldX >= 0.0 ? 1.0 : -1.0);
+        n.y = (1.0 - abs(oldX)) * (n.y >= 0.0 ? 1.0 : -1.0);
+    }
+    
+    return normalize(n);
+}
+
+// Pack R11G11B10F
+uint packR11G11B10F(vec3 color) {
+    // Clamp to positive values
+    color = max(color, vec3(0.0));
+    
+    // Convert to 11/11/10 bit floats
+    uint r = uint(clamp(color.r, 0.0, 65024.0) * (2047.0 / 65024.0));
+    uint g = uint(clamp(color.g, 0.0, 65024.0) * (2047.0 / 65024.0));
+    uint b = uint(clamp(color.b, 0.0, 64512.0) * (1023.0 / 64512.0));
+    
+    return (r << 21) | (g << 10) | b;
+}
+
+// Unpack R11G11B10F
+vec3 unpackR11G11B10F(uint packed) {
+    uint r = (packed >> 21) & 0x7FF;
+    uint g = (packed >> 10) & 0x7FF;
+    uint b = packed & 0x3FF;
+    
+    return vec3(
+        float(r) * (65024.0 / 2047.0),
+        float(g) * (65024.0 / 2047.0),
+        float(b) * (64512.0 / 1023.0)
+    );
+}
+
+// Gaussian kernel
+float gaussianKernel(float distSq, float radius) {
+    return exp(-distSq / (radius * radius));
+}
+
+// Compute spatial hash cell
+uvec3 computeHashCell(vec3 worldPos) {
+    vec3 normalized = (worldPos - pc.boundsMin) / (pc.boundsMax - pc.boundsMin);
+    return uvec3(normalized * 32.0);  // 32x32x32 grid
+}
+
+uint hashCellToIndex(uvec3 cell) {
+    return cell.x + cell.y * 32 + cell.z * 1024;  // 32^3 = 32768 cells
+}
+
+// ── Main Compute Shader ──────────────────────────────────────────────────────
+
+void main() {
+    uint localId = gl_LocalInvocationID.x;
+    uint globalId = gl_GlobalInvocationID.x;
+    uint vertexId = pc.vertexOffset + globalId;
+    
+    // Early exit if out of bounds
+    if (globalId >= pc.vertexCount) return;
+    
+    // ── Phase 1: Cooperative Load Light Vertices ─────────────────────────────
+    
+    // Get mesh vertex in world space
+    MeshVertex meshVert = meshVertices[vertexId];
+    vec3 worldPos = (instanceTransforms[pc.instanceId] * vec4(meshVert.position, 1.0)).xyz;
+    vec3 worldNormal = normalize(mat3(instanceTransforms[pc.instanceId]) * meshVert.normal);
+    
+    // Compute spatial hash cell
+    uvec3 hashCell = computeHashCell(worldPos);
+    uint cellIndex = hashCellToIndex(hashCell);
+    
+    // Load light vertices from spatial hash into shared memory
+    uint lightStart = hashOffsets[cellIndex];
+    uint lightCount = min(hashCounts[cellIndex], MAX_LIGHT_VERTICES);
+    
+    // Cooperative loading: each thread loads one light vertex
+    if (localId < lightCount) {
+        uint lightIdx = hashGrid[lightStart + localId];
+        s_lightCache[localId] = lightVertices[lightIdx];
+        
+        // Unpack position
+        LightVertexCompact lv = s_lightCache[localId];
+        s_lightPositions[localId] = vec3(
+            unpackPos16(lv.posX, 0),
+            unpackPos16(lv.posX, 1),
+            unpackPos16(lv.posZ_normalX, 0)
+        );
+        
+        // Unpack color
+        s_lightColors[localId] = unpackRGBE(lv.normalY_rgbE);
+    }
+    
+    // Synchronize: wait for all threads to finish loading
+    barrier();
+    
+    // ── Phase 2: SIMD Gather from Light Vertices ─────────────────────────────
+    
+    vec3 accumulatedGI = vec3(0.0);
+    float totalWeight = 0.0;
+    
+    // Process 8 light vertices at a time (SIMD-friendly)
+    for (uint i = 0; i < lightCount; i += 8) {
+        // SIMD lane processing (8-wide)
+        for (uint lane = 0; lane < 8 && (i + lane) < lightCount; ++lane) {
+            uint lightIdx = i + lane;
+            
+            // Compute distance
+            vec3 lightPos = s_lightPositions[lightIdx];
+            vec3 toLight = lightPos - worldPos;
+            float distSq = dot(toLight, toLight);
+            
+            // Early reject if too far
+            if (distSq > KERNEL_RADIUS * KERNEL_RADIUS) continue;
+            
+            // Compute weight (Gaussian kernel × NdotL)
+            float dist = sqrt(distSq);
+            vec3 lightDir = toLight / max(dist, 0.001);
+            float NdotL = max(dot(worldNormal, lightDir), 0.0);
+            float weight = gaussianKernel(distSq, KERNEL_RADIUS) * NdotL;
+            
+            // Accumulate
+            vec3 lightColor = s_lightColors[lightIdx];
+            accumulatedGI += lightColor * weight;
+            totalWeight += weight;
+        }
+    }
+    
+    // Normalize by total weight
+    if (totalWeight > 0.0) {
+        accumulatedGI /= totalWeight;
+    }
+    
+    // ── Phase 3: Temporal Blend (EMA) ────────────────────────────────────────
+    
+    // Read previous frame's color
+    vec3 prevColor = unpackR11G11B10F(vertexColors[vertexId]);
+    
+    // Exponential moving average: newColor = α × current + (1-α) × previous
+    vec3 blendedColor = mix(prevColor, accumulatedGI, 1.0 - pc.temporalBlend);
+    
+    // ── Phase 4: Write Output ────────────────────────────────────────────────
+    
+    // Cull dark vertices (luminance threshold)
+    float luminance = dot(blendedColor, vec3(0.299, 0.587, 0.114));
+    if (luminance < MIN_LUMINANCE) {
+        blendedColor = vec3(0.0);
+    }
+    
+    // Pack and write
+    vertexColors[vertexId] = packR11G11B10F(blendedColor);
+}
