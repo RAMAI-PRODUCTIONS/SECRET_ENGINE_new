@@ -17,7 +17,7 @@
         "scale": [20, 20, 1]
       },
       "mesh": {
-        "path": "meshes/Plane.meshbin",
+        "path": "meshes/wall.meshbin",
         "color": [0.2, 0.2, 0.3, 1.0]
       }
     },

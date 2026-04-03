@@ -804,6 +804,16 @@ uint64_t RendererPlugin::GetVRAMUsage() {
     return SecretEngine::Vulkan::Helpers::GetVRAMAllocated();
 }
 
+void RendererPlugin::ClearAllInstances() {
+    if (m_megaGeometry) {
+        m_megaGeometry->ClearAllInstances();
+    }
+    
+    if (m_core && m_core->GetLogger()) {
+        m_core->GetLogger()->LogInfo("VulkanRenderer", "All instances cleared for level change");
+    }
+}
+
 bool RendererPlugin::CreateRenderPass() {
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = m_swapchain->GetFormat();

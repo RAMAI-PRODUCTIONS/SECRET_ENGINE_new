@@ -6,76 +6,11 @@
       "path": "Assets/main_menu.json",
       "type": "persistent",
       "streamingMethod": "always",
-      "autoLoad": true,
+      "autoLoad": false,
       "makeVisibleAfterLoad": false,
       "bounds": {
         "center": [0, 0, 0],
         "extents": [50, 50, 50]
-      }
-    },
-    {
-      "name": "Scene",
-      "path": "Assets/scene.json",
-      "type": "streaming",
-      "streamingMethod": "manual",
-      "autoLoad": false,
-      "blockOnLoad": true,
-      "makeVisibleAfterLoad": true,
-      "bounds": {
-        "center": [0, 0, 0],
-        "extents": [500, 100, 500]
-      }
-    },
-    {
-      "name": "FPS_Arena",
-      "path": "Assets/fps_arena.json",
-      "type": "streaming",
-      "streamingMethod": "manual",
-      "autoLoad": false,
-      "blockOnLoad": true,
-      "makeVisibleAfterLoad": true,
-      "bounds": {
-        "center": [0, 0, 0],
-        "extents": [100, 50, 100]
-      }
-    },
-    {
-      "name": "RacingTrack",
-      "path": "Assets/racing_track.json",
-      "type": "streaming",
-      "streamingMethod": "manual",
-      "autoLoad": false,
-      "blockOnLoad": true,
-      "makeVisibleAfterLoad": true,
-      "bounds": {
-        "center": [0, 0, 0],
-        "extents": [200, 50, 100]
-      }
-    },
-    {
-      "name": "levelone",
-      "path": "Assets/levels/levelone.json",
-      "type": "streaming",
-      "streamingMethod": "manual",
-      "autoLoad": true,
-      "blockOnLoad": true,
-      "makeVisibleAfterLoad": true,
-      "bounds": {
-        "center": [0, 0, 0],
-        "extents": [100, 50, 100]
-      }
-    },
-    {
-      "name": "leveltwo",
-      "path": "Assets/levels/leveltwo.json",
-      "type": "streaming",
-      "streamingMethod": "manual",
-      "autoLoad": false,
-      "blockOnLoad": true,
-      "makeVisibleAfterLoad": true,
-      "bounds": {
-        "center": [0, 0, 0],
-        "extents": [100, 50, 100]
       }
     }
   ]

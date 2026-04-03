@@ -3,6 +3,7 @@
 #include "V73LevelSystemPlugin.h"
 #include "Streaming/NetworkedLevelStreamer.h"
 #include <SecretEngine/Components.h>
+#include <SecretEngine/IRenderer.h>
 
 namespace SecretEngine::Levels::V73 {
 
@@ -134,6 +135,15 @@ bool V73LevelSystemPlugin::LoadLevel(const std::string& levelPath) {
     snprintf(msg, sizeof(msg), "Loading level: %s", levelPath.c_str());
     m_logger->LogInfo("V73LevelSystemPlugin", msg);
     
+    // Clear all renderer instances before loading new level
+    if (m_core) {
+        auto* renderer = reinterpret_cast<IRenderer*>(m_core->GetCapability("rendering"));
+        if (renderer) {
+            m_logger->LogInfo("V73LevelSystemPlugin", "Clearing all renderer instances before loading new level...");
+            renderer->ClearAllInstances();
+        }
+    }
+    
     bool success = m_levelManager->LoadLevel(levelPath);
     
     if (success) {
@@ -168,6 +178,15 @@ bool V73LevelSystemPlugin::UnloadLevel() {
     if (!m_levelManager) return false;
     
     m_logger->LogInfo("V73LevelSystemPlugin", "Unloading current level...");
+    
+    // Clear all renderer instances before unloading level
+    if (m_core) {
+        auto* renderer = reinterpret_cast<IRenderer*>(m_core->GetCapability("rendering"));
+        if (renderer) {
+            m_logger->LogInfo("V73LevelSystemPlugin", "Clearing all renderer instances...");
+            renderer->ClearAllInstances();
+        }
+    }
     
     bool success = m_levelManager->UnloadLevel();
     

@@ -6,6 +6,7 @@
 #include "LevelManager.h"
 #include <SecretEngine/Components.h>
 #include <SecretEngine/IAssetProvider.h>
+#include <SecretEngine/IRenderer.h>
 
 namespace SecretEngine::Levels {
 
@@ -116,6 +117,15 @@ bool LevelManager::LoadLevel(const char* levelName, LoadPriority priority) {
         return true;
     }
     
+    // Clear all renderer instances before loading new level
+    if (m_core) {
+        auto* renderer = reinterpret_cast<IRenderer*>(m_core->GetCapability("rendering"));
+        if (renderer) {
+            m_logger->LogInfo("LevelManager", "Clearing all renderer instances before loading new level...");
+            renderer->ClearAllInstances();
+        }
+    }
+    
     // Unload current level before loading new one (except persistent levels)
     if (level->definition.type != LevelType::Persistent) {
         UnloadCurrentLevel();
@@ -169,6 +179,15 @@ bool LevelManager::UnloadLevel(const char* levelName) {
     char msg[128];
     snprintf(msg, sizeof(msg), "Unloading level: %s", levelName);
     m_logger->LogInfo("LevelManager", msg);
+    
+    // Clear all renderer instances when unloading
+    if (m_core) {
+        auto* renderer = reinterpret_cast<IRenderer*>(m_core->GetCapability("rendering"));
+        if (renderer) {
+            m_logger->LogInfo("LevelManager", "Clearing all renderer instances...");
+            renderer->ClearAllInstances();
+        }
+    }
     
     level->state = LevelState::Unloading;
     

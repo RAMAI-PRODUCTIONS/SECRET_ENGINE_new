@@ -17,5 +17,6 @@ namespace SecretEngine {
         virtual void SetDebugInfo(int slot, const char* text) {}
         virtual void GetStats(uint32_t& instances, uint32_t& triangles, uint32_t& drawCalls) {}
         virtual uint64_t GetVRAMUsage() { return 0; } // Returns VRAM usage in bytes
+        virtual void ClearAllInstances() {} // Clear all instances when changing levels
     };
 }

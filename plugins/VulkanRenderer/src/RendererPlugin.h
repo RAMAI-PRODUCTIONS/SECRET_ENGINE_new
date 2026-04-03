@@ -43,6 +43,7 @@ public:
     void SetDebugInfo(int slot, const char* text) override;
     void GetStats(uint32_t& instances, uint32_t& triangles, uint32_t& drawCalls) override;
     uint64_t GetVRAMUsage() override; // Returns VRAM usage in bytes
+    void ClearAllInstances() override; // Clear all instances when changing levels
     void DrawWelcomeText(VkCommandBuffer cmd);
 
 private:

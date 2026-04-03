@@ -18,7 +18,7 @@
         "rotation": [0, 0, 0],
         "scale": [20, 20, 2]
       },
-      "mesh": "meshes/cube.meshbin",
+      "mesh": "meshes/wall.meshbin",
       "color": [0.3, 0.5, 0.7, 1.0]
     }
   ]

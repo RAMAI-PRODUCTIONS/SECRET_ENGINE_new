@@ -703,6 +703,34 @@ uint32_t MegaGeometryRenderer::AddInstance(uint32_t meshSlot, float x, float y, 
 
 void MegaGeometryRenderer::RemoveInstance(uint32_t instanceID, uint32_t meshSlot) {}
 
+void MegaGeometryRenderer::ClearAllInstances() {
+    auto logger = m_core ? m_core->GetLogger() : nullptr;
+    
+    // Reset instance counter
+    uint32_t oldCount = m_totalInstances.exchange(0);
+    
+    // Clear all instance data in both buffers
+    for (int i = 0; i < 2; ++i) {
+        if (m_instanceDataMapped[i]) {
+            memset(m_instanceDataMapped[i], 0, sizeof(InstanceData) * MAX_INSTANCES);
+        }
+        
+        // Reset all indirect draw commands
+        if (m_indirectMapped[i]) {
+            for (uint32_t meshSlot = 0; meshSlot < MAX_MESHES; ++meshSlot) {
+                m_indirectMapped[i][meshSlot].instanceCount = 0;
+                // Keep indexCount, firstIndex, vertexOffset as they're mesh-specific
+            }
+        }
+    }
+    
+    if (logger) {
+        char msg[256];
+        snprintf(msg, sizeof(msg), "✓ Cleared all instances: %u instances removed", oldCount);
+        logger->LogInfo("MegaGeometryRenderer", msg);
+    }
+}
+
 MegaGeometryRenderer::RenderStats MegaGeometryRenderer::GetStats() const { 
     uint32_t totalTris = 0;
     uint32_t totalInstances = m_totalInstances.load();

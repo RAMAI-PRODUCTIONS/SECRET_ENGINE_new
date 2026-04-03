@@ -133,6 +133,7 @@ public:
     bool LoadMesh(const char* path, uint32_t meshSlot);
     uint32_t AddInstance(uint32_t meshSlot, float x, float y, float z, uint32_t textureID = UINT32_MAX);
     void RemoveInstance(uint32_t instanceID, uint32_t meshSlot);
+    void ClearAllInstances(); // Clear all instances when changing levels
     
     struct RenderStats {
         uint32_t totalInstances;
