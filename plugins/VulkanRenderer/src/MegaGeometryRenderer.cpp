@@ -15,6 +15,7 @@
 #include <algorithm>
 #include "Pipeline3D.h" // For MeshHeader and Vertex3D
 #include "SimpleVertexLighting.h"
+#include "VertexShadowsGI.h"
 
 using namespace SecretEngine::Math;
 
@@ -533,9 +534,9 @@ bool MegaGeometryRenderer::LoadMesh(const char* path, uint32_t meshSlot) {
         vDest[i].vertexColor = 0xFFFFFFFF;
     }
     
-    // Stage 3: Compute Vertex Lighting (HDR vertex colors)
+    // Stage 3: Compute Vertex Lighting with Shadows & GI
     if (logger) {
-        logger->LogInfo("MegaGeometryRenderer", "Computing vertex lighting...");
+        logger->LogInfo("MegaGeometryRenderer", "Computing vertex lighting with shadows & GI...");
     }
     
     // Create lighting engine with scene lights
@@ -554,34 +555,64 @@ bool MegaGeometryRenderer::LoadMesh(const char* path, uint32_t meshSlot) {
     lighting.AddPointLight(Float3{30.0f, 3.0f, 5.0f}, Float3{0.2f, 0.5f, 1.0f}, 2.5f, 12.0f);
     lighting.AddPointLight(Float3{20.0f, 3.0f, 8.0f}, Float3{0.8f, 1.0f, 0.6f}, 2.0f, 10.0f);
     
-    // Compute lighting for each vertex
+    // Create shadow/GI system
+    SecretEngine::VertexShadowsGI shadowGI;
+    shadowGI.SetSkyColor(Float3{0.5f, 0.7f, 1.0f});      // Blue sky
+    shadowGI.SetGroundColor(Float3{0.3f, 0.25f, 0.2f});  // Brown ground
+    shadowGI.SetGIIntensity(0.3f);
+    shadowGI.SetShadowSoftness(0.2f); // Soft shadows
+    
+    // Build scene geometry for shadow raycasting
+    SecretEngine::SceneGeometry sceneGeo;
+    std::vector<Float3> positions(header.vertexCount);
+    std::vector<Float3> normals(header.vertexCount);
+    std::vector<uint32_t> indices(header.indexCount);
+    
     for (uint32_t i = 0; i < header.vertexCount; ++i) {
-        // Decode position and normal for lighting computation
-        Float3 position{
+        positions[i] = Float3{
             float(vDest[i].pos[0]) / 4096.0f,
             float(vDest[i].pos[1]) / 4096.0f,
             float(vDest[i].pos[2]) / 4096.0f
         };
-        
-        Float3 normal = Normalize(Float3{
+        normals[i] = Normalize(Float3{
             float(vDest[i].norm[0]) / 127.0f,
             float(vDest[i].norm[1]) / 127.0f,
             float(vDest[i].norm[2]) / 127.0f
         });
+    }
+    
+    uint32_t* srcIndices = (uint32_t*)(rawBuffer.data() + sizeof(MeshHeader) + (header.vertexCount * sizeof(Vertex3D)));
+    for (uint32_t i = 0; i < header.indexCount; ++i) {
+        indices[i] = srcIndices[i];
+    }
+    
+    sceneGeo.AddMesh(positions.data(), normals.data(), header.vertexCount,
+                     indices.data(), header.indexCount);
+    
+    // Material diffuse color (default white, can be loaded from material system later)
+    Float3 materialDiffuse{1.0f, 1.0f, 1.0f};
+    
+    // Compute lighting with shadows & GI for each vertex
+    for (uint32_t i = 0; i < header.vertexCount; ++i) {
+        // Use normal map if available (for now, just use vertex normal)
+        Float3 normal = normals[i];
         
-        // Compute lighting and pack to R11G11B10F
-        Float3 litColor = lighting.ComputeVertexLighting(position, normal);
+        // Compute full lighting with shadows and GI
+        Float3 litColor = shadowGI.ComputeLightingWithShadowsGI(
+            positions[i], normal, lighting, sceneGeo, materialDiffuse
+        );
+        
+        // Pack to R11G11B10F
         vDest[i].vertexColor = SecretEngine::SimpleVertexLighting::PackR11G11B10F(litColor);
     }
     
     if (logger) {
         char msg[256];
-        snprintf(msg, sizeof(msg), "✓ Computed lighting for %u vertices", header.vertexCount);
+        snprintf(msg, sizeof(msg), "✓ Computed lighting with shadows & GI for %u vertices", header.vertexCount);
         logger->LogInfo("MegaGeometryRenderer", msg);
     }
     
-    // Quantize Indices to 16-bit
-    uint32_t* srcIndices = (uint32_t*)(rawBuffer.data() + sizeof(MeshHeader) + (header.vertexCount * sizeof(Vertex3D)));
+    // Quantize Indices to 16-bit (reuse srcIndices from above)
     for (uint32_t i = 0; i < header.indexCount; ++i) {
         iDest[i] = (uint16_t)srcIndices[i];
     }

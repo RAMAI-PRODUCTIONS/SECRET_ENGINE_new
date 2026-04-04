@@ -187,6 +187,12 @@ public:
         m_ambientIntensity = intensity;
     }
     
+    // Get lights (for shadow/GI system)
+    const std::vector<Light>& GetLights() const { return m_lights; }
+    
+    // Get ambient (for shadow/GI system)
+    Float3 GetAmbient() const { return m_ambientColor * m_ambientIntensity; }
+    
 private:
     std::vector<Light> m_lights;
     Float3 m_ambientColor = Float3{0.2f, 0.2f, 0.3f};
