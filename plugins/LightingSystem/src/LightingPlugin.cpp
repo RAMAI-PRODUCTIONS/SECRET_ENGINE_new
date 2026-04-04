@@ -41,7 +41,16 @@ void LightingPlugin::OnUnload() {
 }
 
 void LightingPlugin::OnUpdate(float deltaTime) {
-    // Update light animations, shadows, etc.
+    // Update light animations, intensity pulsing, etc.
+    if (!m_lightManager) return;
+    
+    auto lights = m_lightManager->GetLightBuffer();
+    for (size_t i = 0; i < lights.size(); ++i) {
+        // Future: Add light animation logic here
+        // - Flickering torches
+        // - Pulsing lights
+        // - Moving lights
+    }
 }
 
 uint32_t LightingPlugin::AddLight(const SecretEngine::LightData& light) {

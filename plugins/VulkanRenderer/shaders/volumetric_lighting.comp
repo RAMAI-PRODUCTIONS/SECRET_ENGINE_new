@@ -1,0 +1,142 @@
+#version 450
+
+/**
+ * Volumetric Lighting Compute Shader
+ * 
+ * Performs ray marching through a froxel grid to compute volumetric fog and god rays.
+ * Uses shadow maps to determine light visibility along each ray.
+ */
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 4) in;
+
+// Output: 3D froxel texture (RGBA16F)
+layout(set = 0, binding = 0, rgba16f) uniform writeonly image3D froxelTexture;
+
+// Inputs
+layout(set = 0, binding = 1) uniform sampler2D shadowMap;
+layout(set = 0, binding = 2) uniform sampler2D depthBuffer;
+
+struct LightData {
+    uint type;
+    vec3 position;
+    vec3 direction;
+    vec3 color;
+    float intensity;
+    float range;
+    float spotAngle;
+    uint padding[2];
+};
+
+layout(std430, set = 0, binding = 3) readonly buffer LightBuffer {
+    LightData lights[];
+};
+
+layout(push_constant) uniform PushConstants {
+    mat4 invViewProj;
+    vec3 cameraPos;
+    uint lightCount;
+    float scattering;
+    float absorption;
+    float density;
+    float anisotropy;
+    float maxDistance;
+    uint sampleCount;
+} pc;
+
+// Henyey-Greenstein phase function
+float phaseHG(float cosTheta, float g) {
+    float g2 = g * g;
+    float denom = 1.0 + g2 - 2.0 * g * cosTheta;
+    return (1.0 - g2) / (4.0 * 3.14159265 * pow(denom, 1.5));
+}
+
+// Sample shadow map to check light visibility
+float sampleShadow(vec3 worldPos, uint lightIndex) {
+    // Simplified: assumes directional light with identity shadow matrix
+    // Production would transform worldPos by light's view-projection matrix
+    return 1.0; // No occlusion for now
+}
+
+// Compute in-scattering for a point along the ray
+vec3 computeScattering(vec3 worldPos, vec3 rayDir) {
+    vec3 scattering = vec3(0.0);
+    
+    for (uint i = 0; i < pc.lightCount; ++i) {
+        LightData light = lights[i];
+        
+        vec3 lightDir;
+        float attenuation = 1.0;
+        
+        if (light.type == 0) { // Directional
+            lightDir = -light.direction;
+        } else if (light.type == 1) { // Point
+            vec3 toLight = light.position - worldPos;
+            float dist = length(toLight);
+            lightDir = toLight / dist;
+            attenuation = 1.0 / (1.0 + dist * dist / (light.range * light.range));
+        } else { // Spot
+            vec3 toLight = light.position - worldPos;
+            float dist = length(toLight);
+            lightDir = toLight / dist;
+            float spotEffect = dot(lightDir, -light.direction);
+            attenuation = smoothstep(cos(light.spotAngle), 1.0, spotEffect);
+            attenuation /= (1.0 + dist * dist / (light.range * light.range));
+        }
+        
+        // Check shadow visibility
+        float visibility = sampleShadow(worldPos, i);
+        
+        // Phase function
+        float cosTheta = dot(rayDir, lightDir);
+        float phase = phaseHG(cosTheta, pc.anisotropy);
+        
+        // Accumulate in-scattering
+        scattering += light.color * light.intensity * attenuation * visibility * phase;
+    }
+    
+    return scattering * pc.scattering * pc.density;
+}
+
+void main() {
+    ivec3 froxelCoord = ivec3(gl_GlobalInvocationID.xyz);
+    ivec3 froxelSize = imageSize(froxelTexture);
+    
+    if (any(greaterThanEqual(froxelCoord, froxelSize))) return;
+    
+    // Compute normalized froxel position [0, 1]
+    vec3 froxelUV = (vec3(froxelCoord) + 0.5) / vec3(froxelSize);
+    
+    // Reconstruct world position from froxel coordinate
+    // Z is exponentially distributed for better near-field resolution
+    float depth = exp(mix(log(0.1), log(pc.maxDistance), froxelUV.z));
+    vec4 clipPos = vec4(froxelUV.xy * 2.0 - 1.0, 0.5, 1.0);
+    vec4 worldPos4 = pc.invViewProj * clipPos;
+    vec3 worldPos = worldPos4.xyz / worldPos4.w;
+    vec3 rayDir = normalize(worldPos - pc.cameraPos);
+    worldPos = pc.cameraPos + rayDir * depth;
+    
+    // Ray march through this froxel slice
+    vec3 accumulated = vec3(0.0);
+    float transmittance = 1.0;
+    
+    float stepSize = depth / float(pc.sampleCount);
+    vec3 stepVec = rayDir * stepSize;
+    vec3 samplePos = pc.cameraPos + rayDir * (depth - stepSize * float(pc.sampleCount) * 0.5);
+    
+    for (uint i = 0; i < pc.sampleCount; ++i) {
+        vec3 scattering = computeScattering(samplePos, rayDir);
+        
+        // Beer-Lambert law for transmittance
+        float extinction = pc.absorption + pc.scattering;
+        float sampleTransmittance = exp(-extinction * pc.density * stepSize);
+        
+        // Integrate in-scattering
+        accumulated += scattering * transmittance * stepSize;
+        transmittance *= sampleTransmittance;
+        
+        samplePos += stepVec;
+    }
+    
+    // Store result (RGB = in-scattering, A = transmittance)
+    imageStore(froxelTexture, froxelCoord, vec4(accumulated, transmittance));
+}

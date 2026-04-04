@@ -10,9 +10,10 @@
 // ============================================================================
 // INPUT (Per-vertex attributes - NITRO BALANCED 16-BIT)
 // ============================================================================
-layout(location = 0) in vec4 inPosition; // R16G16B16A16_SNORM
-layout(location = 1) in vec4 inNormal;   // R8G8B8A8_SNORM
-layout(location = 2) in vec2 inTexCoord; // R16G16_UNORM
+layout(location = 0) in vec4 inPosition;    // R16G16B16A16_SNORM
+layout(location = 1) in vec4 inNormal;      // R8G8B8A8_SNORM
+layout(location = 2) in vec2 inTexCoord;    // R16G16_UNORM
+layout(location = 3) in uint inVertexColor; // R32_UINT (R11G11B10F packed lighting)
 
 // ============================================================================
 // OUTPUT (To fragment shader)
@@ -20,7 +21,8 @@ layout(location = 2) in vec2 inTexCoord; // R16G16_UNORM
 layout(location = 0) out vec2 fragTexCoord;
 layout(location = 1) out vec3 fragNormal;
 layout(location = 2) out vec4 fragColor;
-layout(location = 3) out flat uint fragTextureID;
+layout(location = 3) out vec3 fragVertexLight;  // Dynamic per-vertex lighting
+layout(location = 4) out flat uint fragTextureID;
 
 // ============================================================================
 // INSTANCE DATA (SSBO - Extended with texture ID, 64 bytes total)
@@ -46,6 +48,22 @@ layout(push_constant) uniform CameraData {
     mat4 viewProj;
 } camera;
 
+// ============================================================================
+// UNPACK R11G11B10F (HDR vertex lighting)
+// ============================================================================
+vec3 unpackR11G11B10F(uint packed) {
+    uint r = (packed >> 21) & 0x7FF;  // 11 bits
+    uint g = (packed >> 10) & 0x7FF;  // 11 bits
+    uint b = packed & 0x3FF;          // 10 bits
+    
+    // Convert to float [0, 1] then scale to HDR range [0, 64]
+    return vec3(
+        float(r) / 2047.0,
+        float(g) / 2047.0,
+        float(b) / 1023.0
+    ) * 64.0;  // HDR multiplier for bright lights
+}
+
 void main() {
     // Fetch instance data
     InstanceData instance = instances[gl_InstanceIndex];
@@ -70,12 +88,16 @@ void main() {
     float invLen = inversesqrt(dot(N, N));
     N *= invLen;
     
-    // UNLIT: No lighting calculations - use raw instance color
+    // Unpack instance color (base tint)
     vec4 instanceColor = unpackUnorm4x8(instance.packedColor);
+    
+    // Unpack vertex lighting (dynamic per-vertex)
+    vec3 vertexLight = unpackR11G11B10F(inVertexColor);
     
     // Output to fragment shader
     fragTexCoord = inTexCoord;
     fragNormal = N;
-    fragColor = instanceColor;  // Use actual instance color from JSON
+    fragColor = instanceColor;      // Base color/tint
+    fragVertexLight = vertexLight;  // Dynamic lighting
     fragTextureID = instance.textureID;
 }

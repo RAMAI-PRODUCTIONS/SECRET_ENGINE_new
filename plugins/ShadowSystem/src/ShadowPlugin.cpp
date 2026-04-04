@@ -219,25 +219,47 @@ void ShadowPlugin::CalculateCascadeSplits(ShadowMapData& shadowMap) {
 }
 
 void ShadowPlugin::UpdateShadowMatrices(ShadowMapData& shadowMap) {
-    // TODO: Calculate light view-projection matrices for each cascade
-    // This requires camera and light information
-    // For now, just identity matrices
+    // Calculate light view-projection matrices for each cascade
+    // This creates orthographic projection matrices for directional lights
+    
     for (uint32_t i = 0; i < shadowMap.cascadeCount; ++i) {
         float* matrix = &shadowMap.shadowMatrix[i * 16];
-        // Identity matrix
-        for (int j = 0; j < 16; ++j) {
-            matrix[j] = (j % 5 == 0) ? 1.0f : 0.0f;
-        }
+        
+        // Calculate cascade frustum bounds
+        float nearDist = (i == 0) ? 0.1f : shadowMap.cascadeSplits[i - 1];
+        float farDist = shadowMap.cascadeSplits[i];
+        
+        // Create orthographic projection for this cascade
+        // Simplified: assumes light direction is (0, -1, 0) looking down
+        float size = farDist * 0.5f;
+        
+        // Orthographic projection matrix
+        matrix[0] = 1.0f / size;  matrix[1] = 0.0f;         matrix[2] = 0.0f;          matrix[3] = 0.0f;
+        matrix[4] = 0.0f;         matrix[5] = 1.0f / size;  matrix[6] = 0.0f;          matrix[7] = 0.0f;
+        matrix[8] = 0.0f;         matrix[9] = 0.0f;         matrix[10] = -2.0f / farDist; matrix[11] = 0.0f;
+        matrix[12] = 0.0f;        matrix[13] = 0.0f;        matrix[14] = -1.0f;        matrix[15] = 1.0f;
     }
 }
 
 void ShadowPlugin::InitializeVolumetric() {
-    // TODO: Create 3D texture for volumetric lighting
-    // TODO: Create compute shader for ray marching
-    // This would be done by the renderer backend
+    // Initialize volumetric lighting resources
+    // The actual GPU resources (3D texture, compute pipeline) are created by the renderer
+    // This just sets up the configuration
     
-    if (m_core && m_core->GetLogger()) {
-        m_core->GetLogger()->LogInfo("ShadowSystem", "Volumetric lighting initialized (ray marching compute shader)");
+    if (m_volumetric.desc.enabled) {
+        // Validate volumetric settings
+        if (m_volumetric.desc.sampleCount < 8) m_volumetric.desc.sampleCount = 8;
+        if (m_volumetric.desc.sampleCount > 128) m_volumetric.desc.sampleCount = 128;
+        
+        if (m_core && m_core->GetLogger()) {
+            char msg[256];
+            snprintf(msg, sizeof(msg), 
+                "Volumetric lighting initialized: samples=%u, scattering=%.2f, density=%.3f",
+                m_volumetric.desc.sampleCount, 
+                m_volumetric.desc.scattering,
+                m_volumetric.desc.density);
+            m_core->GetLogger()->LogInfo("ShadowSystem", msg);
+        }
     }
 }
 

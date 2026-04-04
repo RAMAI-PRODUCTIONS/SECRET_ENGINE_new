@@ -16,11 +16,12 @@ struct Vertex3D {
 };
 
 struct Vertex3DNitro {
-    int16_t pos[4];    // 8 bytes - 16-bit Nitro Positioning (Supports wide range)
-    int8_t  norm[4];   // 4 bytes - 8-bit Nitro Normals (Fast decoding)
-    uint16_t uv[2];    // 4 bytes - 16-bit Nitro UVs (Texture fidelity)
+    int16_t pos[4];       // 8 bytes - 16-bit Nitro Positioning (Supports wide range)
+    int8_t  norm[4];      // 4 bytes - 8-bit Nitro Normals (Fast decoding)
+    uint16_t uv[2];       // 4 bytes - 16-bit Nitro UVs (Texture fidelity)
+    uint32_t vertexColor; // 4 bytes - R11G11B10F packed lighting (NEW)
 };
-static_assert(sizeof(Vertex3DNitro) == 16, "Vertex3DNitro must be 16 bytes for peak Nitrogen cache efficiency");
+static_assert(sizeof(Vertex3DNitro) == 20, "Vertex3DNitro must be 20 bytes with vertex color");
 
 struct MeshHeader {
     char magic[4];

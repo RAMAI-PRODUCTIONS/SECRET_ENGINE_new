@@ -14,6 +14,7 @@
 #include <cstring>
 #include <algorithm>
 #include "Pipeline3D.h" // For MeshHeader and Vertex3D
+#include "SimpleVertexLighting.h"
 
 using namespace SecretEngine::Math;
 
@@ -373,14 +374,15 @@ bool MegaGeometryRenderer::CreatePipeline(VkRenderPass renderPass) {
     stages[1] = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0, VK_SHADER_STAGE_FRAGMENT_BIT, fragMod, "main", nullptr};
 
     VkVertexInputBindingDescription binding = {0, sizeof(Vertex3DNitro), VK_VERTEX_INPUT_RATE_VERTEX};
-    VkVertexInputAttributeDescription attrs[3] = {
+    VkVertexInputAttributeDescription attrs[4] = {
         {0, 0, VK_FORMAT_R16G16B16A16_SNORM, 0},   // Position (8 bytes, 16-bit)
         {1, 0, VK_FORMAT_R8G8B8A8_SNORM, 8},       // Normal (4 bytes, 8-bit)
-        {2, 0, VK_FORMAT_R16G16_UNORM, 12}         // UV (4 bytes, 16-bit)
+        {2, 0, VK_FORMAT_R16G16_UNORM, 12},        // UV (4 bytes, 16-bit)
+        {3, 0, VK_FORMAT_R32_UINT, 16}             // Vertex Color (4 bytes, R11G11B10F packed)
     };
     VkPipelineVertexInputStateCreateInfo vi = {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     vi.vertexBindingDescriptionCount = 1; vi.pVertexBindingDescriptions = &binding;
-    vi.vertexAttributeDescriptionCount = 3; vi.pVertexAttributeDescriptions = attrs;
+    vi.vertexAttributeDescriptionCount = 4; vi.pVertexAttributeDescriptions = attrs;
 
     VkPipelineInputAssemblyStateCreateInfo ia = {VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO}; ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     VkPipelineViewportStateCreateInfo vp = {VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO}; 
@@ -526,6 +528,56 @@ bool MegaGeometryRenderer::LoadMesh(const char* path, uint32_t meshSlot) {
 
         vDest[i].uv[0] = (uint16_t)std::clamp(src[i].uv[0] * 65535.0f, 0.0f, 65535.0f);
         vDest[i].uv[1] = (uint16_t)std::clamp(src[i].uv[1] * 65535.0f, 0.0f, 65535.0f);
+        
+        // Initialize vertex color to white (will be computed by lighting system)
+        vDest[i].vertexColor = 0xFFFFFFFF;
+    }
+    
+    // Stage 3: Compute Vertex Lighting (HDR vertex colors)
+    if (logger) {
+        logger->LogInfo("MegaGeometryRenderer", "Computing vertex lighting...");
+    }
+    
+    // Create lighting engine with scene lights
+    SecretEngine::SimpleVertexLighting lighting;
+    lighting.SetAmbient(Float3{0.2f, 0.2f, 0.3f}, 0.15f);
+    
+    // Add directional light (sun)
+    lighting.AddDirectionalLight(
+        Float3{0.3f, -0.8f, 0.5f},
+        Float3{1.0f, 0.95f, 0.8f},
+        1.2f
+    );
+    
+    // Add point lights based on scene layout
+    lighting.AddPointLight(Float3{10.0f, 3.0f, 2.0f}, Float3{1.0f, 0.6f, 0.2f}, 3.0f, 15.0f);
+    lighting.AddPointLight(Float3{30.0f, 3.0f, 5.0f}, Float3{0.2f, 0.5f, 1.0f}, 2.5f, 12.0f);
+    lighting.AddPointLight(Float3{20.0f, 3.0f, 8.0f}, Float3{0.8f, 1.0f, 0.6f}, 2.0f, 10.0f);
+    
+    // Compute lighting for each vertex
+    for (uint32_t i = 0; i < header.vertexCount; ++i) {
+        // Decode position and normal for lighting computation
+        Float3 position{
+            float(vDest[i].pos[0]) / 4096.0f,
+            float(vDest[i].pos[1]) / 4096.0f,
+            float(vDest[i].pos[2]) / 4096.0f
+        };
+        
+        Float3 normal = Normalize(Float3{
+            float(vDest[i].norm[0]) / 127.0f,
+            float(vDest[i].norm[1]) / 127.0f,
+            float(vDest[i].norm[2]) / 127.0f
+        });
+        
+        // Compute lighting and pack to R11G11B10F
+        Float3 litColor = lighting.ComputeVertexLighting(position, normal);
+        vDest[i].vertexColor = SecretEngine::SimpleVertexLighting::PackR11G11B10F(litColor);
+    }
+    
+    if (logger) {
+        char msg[256];
+        snprintf(msg, sizeof(msg), "✓ Computed lighting for %u vertices", header.vertexCount);
+        logger->LogInfo("MegaGeometryRenderer", msg);
     }
     
     // Quantize Indices to 16-bit
