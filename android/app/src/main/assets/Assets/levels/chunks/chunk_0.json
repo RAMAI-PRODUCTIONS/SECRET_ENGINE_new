@@ -1,0 +1,6173 @@
+{
+  "chunk_id": "chunk_0",
+  "mesh_groups": [
+    {
+      "mesh": "meshes/wall.meshbin",
+      "material": "default.mat",
+      "instances": [
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.005"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.001"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.002"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.003"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.004"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.006"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.007"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.008"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.009"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.010"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.011"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.012"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.013"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.014"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.015"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              -0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.016"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.017"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.018"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.019"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.020"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.021"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.022"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.023"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.024"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.025"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.026"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.027"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.028"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.029"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.030"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.031"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              3.299999952316284
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.032"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.033"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.034"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.035"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.036"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.037"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.038"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.039"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.040"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.041"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.042"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.043"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.044"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.045"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.046"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.047"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              6.599999904632568
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.048"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.049"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.050"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.051"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.052"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.053"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.054"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.055"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.056"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.057"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.058"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.059"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.060"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.061"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.062"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.063"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              9.899999618530273
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.064"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.065"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.066"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.067"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.068"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.069"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.070"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.071"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.072"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.073"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.074"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.075"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.076"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.077"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.078"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.079"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              13.199999809265137
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.080"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.081"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.082"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.083"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.084"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.085"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.086"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.087"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.088"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.089"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.090"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.091"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.092"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.093"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.094"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.095"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.096"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.097"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.098"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.099"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.100"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.101"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.102"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.103"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.104"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.105"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.106"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.107"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.108"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.109"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.110"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.111"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              19.80000114440918
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.112"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.113"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -3.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.114"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.115"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.116"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.117"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.118"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.119"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.120"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.121"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.122"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.123"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.124"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.125"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.126"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.127"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              23.100000381469727
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              -0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.128"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              1.9073486328125e-06,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.129"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.999998092651367,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.130"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.000001907348633,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.131"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.000000953674316,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.132"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.133"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.000000953674316,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.134"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.135"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.136"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.137"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.138"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.139"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.140"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.141"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.142"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.143"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              -3.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.144"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              1.9073486328125e-06,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.145"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.999998092651367,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.146"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              3.000001907348633,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.147"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              6.000000953674316,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.148"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              12.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.149"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              9.000000953674316,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.150"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              15.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.151"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.152"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.153"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.154"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.155"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              30.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.156"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.157"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              33.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.158"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              39.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.159"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              42.0,
+              0.0,
+              23.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.160"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              34.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.161"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              37.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.162"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              31.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.163"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              28.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.164"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              22.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.165"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              25.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.166"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              19.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.167"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.168"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              10.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.169"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              13.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.170"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              7.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.171"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              4.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.172"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              -1.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.173"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              1.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.174"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              -4.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.175"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              44.5,
+              0.0,
+              -7.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.176"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              34.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.177"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              37.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.178"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              31.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.179"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              28.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.180"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              22.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.181"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              25.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.182"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              19.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.183"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.184"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              10.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.185"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              13.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.186"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              7.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.187"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              4.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.188"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              -1.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.189"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              1.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.190"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              -4.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.191"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              -2.5,
+              0.0,
+              -7.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.192"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              6.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.193"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              6.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.194"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              6.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.195"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              6.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.196"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              9.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.197"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              9.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.198"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              9.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.199"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              9.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.200"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              16.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.201"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              16.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.202"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              16.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.203"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              16.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.204"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              18.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.205"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              18.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.206"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              18.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.207"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              18.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.208"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              18.0,
+              0.0,
+              21.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.209"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.0,
+              0.0,
+              21.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.210"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              21.0,
+              0.0,
+              21.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.211"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              27.0,
+              0.0,
+              21.0
+            ],
+            "rotation": [
+              90.00000250447816,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.212"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              13.5,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.213"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              13.5,
+              0.0,
+              10.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.214"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              13.5,
+              0.0,
+              13.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.215"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              13.5,
+              0.0,
+              7.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.216"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              7.5,
+              0.0,
+              16.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.217"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              7.5,
+              0.0,
+              10.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.218"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              7.5,
+              0.0,
+              13.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.219"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              7.5,
+              0.0,
+              7.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.220"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              34.5,
+              0.0,
+              12.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.221"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              34.5,
+              0.0,
+              6.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.222"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              34.5,
+              0.0,
+              9.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.223"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              34.5,
+              0.0,
+              3.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.224"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.5,
+              0.0,
+              20.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.225"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.5,
+              0.0,
+              14.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.226"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.5,
+              0.0,
+              17.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.227"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              36.5,
+              0.0,
+              11.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.228"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              40.5,
+              0.0,
+              15.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.229"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              40.5,
+              0.0,
+              9.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.230"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              40.5,
+              0.0,
+              12.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.231"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              40.5,
+              0.0,
+              6.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.232"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              7.5,
+              0.0,
+              10.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              180.00001866933468,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.233"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              11.5,
+              0.0,
+              2.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.234"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              11.5,
+              0.0,
+              2.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              180.00001866933468,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.235"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.5,
+              0.0,
+              2.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              90.00000250447816,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.236"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        },
+        {
+          "transform": {
+            "position": [
+              24.5,
+              0.0,
+              2.5
+            ],
+            "rotation": [
+              90.00000250447816,
+              180.00001866933468,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tags": {
+            "type": "mesh",
+            "name": "Cube.237"
+          },
+          "culling": {
+            "radius": 1.0
+          }
+        }
+      ]
+    }
+  ]
+}

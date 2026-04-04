@@ -1,0 +1,15 @@
+{
+  "version": "7.3",
+  "name": "level_one",
+  "core": {
+    "transform_settings": {
+      "rotation_format": "euler",
+      "rotation_unit": "degrees",
+      "rotation_order": "YXZ"
+    }
+  },
+  "references": {
+    "players": "entities/player.json",
+    "chunks": ["chunks/chunk_0.json"]
+  }
+}
