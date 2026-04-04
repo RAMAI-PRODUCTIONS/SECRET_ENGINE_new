@@ -8,6 +8,8 @@
 #include <vector>
 #include <atomic>
 #include <cstring>
+#include <unordered_map>
+#include <string>
 #include <SecretEngine/Math.h>
 #include <SecretEngine/IAssetProvider.h>
 #include <SecretEngine/ICore.h>
@@ -131,6 +133,7 @@ public:
     void EndBatchUpdate() { m_batchUpdateActive = false; }
     
     bool LoadMesh(const char* path, uint32_t meshSlot);
+    uint32_t GetOrLoadMeshSlot(const char* meshPath); // Get existing slot or load mesh into new slot
     uint32_t AddInstance(uint32_t meshSlot, float x, float y, float z, uint32_t textureID = UINT32_MAX);
     void RemoveInstance(uint32_t instanceID, uint32_t meshSlot);
     void ClearAllInstances(); // Clear all instances when changing levels
@@ -155,6 +158,10 @@ private:
     VulkanDevice* m_device = nullptr;
     SecretEngine::ICore* m_core = nullptr;
     SecretEngine::Textures::TextureManager* m_textureManager = nullptr;
+    
+    // Mesh path to slot mapping
+    std::unordered_map<std::string, uint32_t> m_meshPathToSlot;
+    uint32_t m_nextMeshSlot = 0;
 };
 
 } // namespace SecretEngine::MegaGeometry

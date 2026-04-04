@@ -2,6 +2,18 @@
   "version": "1.0.0",
   "levels": [
     {
+      "name": "LevelOne",
+      "path": "Assets/levels/level_one.json",
+      "type": "persistent",
+      "streamingMethod": "always",
+      "autoLoad": true,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [20, 0, 10],
+        "extents": [50, 50, 50]
+      }
+    },
+    {
       "name": "MainMenu",
       "path": "Assets/main_menu.json",
       "type": "persistent",

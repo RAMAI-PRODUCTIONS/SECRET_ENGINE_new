@@ -43,14 +43,13 @@ void MeshRenderingSystem::ProcessNewEntities() {
             continue;
         }
         
-        // Load mesh if needed (assume Character.meshbin for now, slot 0)
-        // In production, you'd map mesh paths to slots
-        uint32_t meshSlot = 0;
+        // Get or load mesh slot dynamically based on mesh path
+        uint32_t meshSlot = m_megaGeometry->GetOrLoadMeshSlot(meshComp->meshPath);
         
-        // Load default texture
+        // Load texture if specified
         uint32_t textureID = UINT32_MAX;
-        if (m_textureManager) {
-            textureID = m_textureManager->LoadTexture("textures/diffuse.jpeg");
+        if (m_textureManager && meshComp->texturePath[0] != '\0') {
+            textureID = m_textureManager->LoadTexture(meshComp->texturePath);
         }
         
         // Add instance to renderer

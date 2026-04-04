@@ -185,14 +185,10 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
         delete m_megaGeometry;
         m_megaGeometry = nullptr;
     } else {
-        logger->LogInfo("VulkanRenderer", "✓ Mega Geometry System initialized");
+        logger->LogInfo("VulkanRenderer", "✓ Mega Geometry System initialized - meshes will be loaded on-demand");
         
-        // Load the character mesh into slot 0 (CRITICAL: Must be done before AddInstance)
-        if (!m_megaGeometry->LoadMesh("meshes/Character.meshbin", 0)) {
-            logger->LogError("VulkanRenderer", "Failed to load Character.meshbin into MegaGeometry slot 0");
-        } else {
-            logger->LogInfo("VulkanRenderer", "✓ Character mesh loaded into MegaGeometry slot 0");
-        }
+        // Meshes are now loaded dynamically via GetOrLoadMeshSlot when entities are created
+        // No need to pre-load any specific mesh
         
         // Instances are already handled by logic/scattering
         // NOTE: Test code for 4000 instances disabled - entities now loaded from level system
@@ -350,6 +346,7 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
                                         mesh->normalMapPath[255] = '\0';
                                     }
 
+                                    // Determine if this is a character mesh for default texture assignment
                                     const bool isCharacterMesh = meshPath.find("Character.meshbin") != std::string::npos;
 
                                     // Provide sensible defaults for character meshes if scene doesn't specify textures
@@ -367,14 +364,17 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
                                     }
                                     
                                     // Instancing: Add this entity to MegaGeometry system WITH COLOR + TEXTURE
-                                    if (isCharacterMesh && m_megaGeometry) {
+                                    if (m_megaGeometry) {
+                                        // Get or load the mesh slot dynamically based on mesh path
+                                        uint32_t meshSlot = m_megaGeometry->GetOrLoadMeshSlot(meshPath.c_str());
+                                        
                                         uint32_t textureID = UINT32_MAX;
                                         if (m_textureManager && mesh->texturePath[0] != '\0') {
                                             textureID = m_textureManager->LoadTexture(mesh->texturePath);
                                         }
 
                                         uint32_t instanceID = m_megaGeometry->AddInstance(
-                                            0,
+                                            meshSlot,
                                             transform->position[0],
                                             transform->position[1],
                                             transform->position[2],

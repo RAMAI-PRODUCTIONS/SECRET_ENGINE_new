@@ -229,11 +229,8 @@ bool MegaGeometryRenderer::Initialize(VulkanDevice* device, VkRenderPass renderP
     Matrix4x4 identity = Matrix4x4::Identity();
     memcpy(m_viewProj, identity.m, 64);
     
-    if (!LoadMesh("meshes/Character.meshbin", 0)) {
-        if (logger) logger->LogError("MegaGeometryRenderer", "LoadMesh failed for meshes/Character.meshbin");
-        return false;
-    }
-    if (logger) logger->LogInfo("MegaGeometryRenderer", "Mesh loaded successfully, indexCount set");
+    // No longer pre-load Character.meshbin - meshes will be loaded on-demand
+    if (logger) logger->LogInfo("MegaGeometryRenderer", "MegaGeometry initialized - ready for dynamic mesh loading");
     
     return true;
 }
@@ -567,6 +564,48 @@ bool MegaGeometryRenderer::LoadMesh(const char* path, uint32_t meshSlot) {
     return true;
 }
 
+uint32_t MegaGeometryRenderer::GetOrLoadMeshSlot(const char* meshPath) {
+    auto logger = m_core ? m_core->GetLogger() : nullptr;
+    
+    // Check if mesh is already loaded
+    auto it = m_meshPathToSlot.find(meshPath);
+    if (it != m_meshPathToSlot.end()) {
+        return it->second;
+    }
+    
+    // Check if we have room for more meshes
+    if (m_nextMeshSlot >= MAX_MESHES) {
+        if (logger) {
+            char msg[256];
+            snprintf(msg, sizeof(msg), "GetOrLoadMeshSlot: MAX_MESHES (%u) reached, cannot load %s", MAX_MESHES, meshPath);
+            logger->LogError("MegaGeometryRenderer", msg);
+        }
+        return 0; // Fallback to slot 0
+    }
+    
+    // Load the mesh into the next available slot
+    uint32_t slot = m_nextMeshSlot;
+    if (LoadMesh(meshPath, slot)) {
+        m_meshPathToSlot[meshPath] = slot;
+        m_nextMeshSlot++;
+        
+        if (logger) {
+            char msg[256];
+            snprintf(msg, sizeof(msg), "GetOrLoadMeshSlot: Loaded %s into slot %u", meshPath, slot);
+            logger->LogInfo("MegaGeometryRenderer", msg);
+        }
+        
+        return slot;
+    } else {
+        if (logger) {
+            char msg[256];
+            snprintf(msg, sizeof(msg), "GetOrLoadMeshSlot: Failed to load %s", meshPath);
+            logger->LogError("MegaGeometryRenderer", msg);
+        }
+        return 0; // Fallback to slot 0
+    }
+}
+
 bool MegaGeometryRenderer::CreateVisibleBuffer() {
     VkDeviceSize bufferSize = sizeof(InstanceData) * MAX_INSTANCES;
     for(int i=0; i<2; ++i) {
@@ -724,9 +763,13 @@ void MegaGeometryRenderer::ClearAllInstances() {
         }
     }
     
+    // Note: We do NOT clear m_meshPathToSlot or reset m_nextMeshSlot
+    // Meshes remain loaded in GPU memory for reuse across level changes
+    // This avoids reloading the same meshes repeatedly
+    
     if (logger) {
         char msg[256];
-        snprintf(msg, sizeof(msg), "✓ Cleared all instances: %u instances removed", oldCount);
+        snprintf(msg, sizeof(msg), "✓ Cleared all instances: %u instances removed (meshes remain loaded)", oldCount);
         logger->LogInfo("MegaGeometryRenderer", msg);
     }
 }
