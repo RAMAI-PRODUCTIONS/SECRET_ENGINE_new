@@ -2,7 +2,9 @@
 
 #include "V73LevelSystemPlugin.h"
 #include "Streaming/NetworkedLevelStreamer.h"
+#include "SceneLoader.h" // NEW: Scene loader
 #include <SecretEngine/Components.h>
+#include <SecretEngine/Scene.h> // NEW: Scene support
 #include <SecretEngine/IRenderer.h>
 
 namespace SecretEngine::Levels::V73 {
@@ -38,16 +40,38 @@ void V73LevelSystemPlugin::OnActivate() {
     
     m_logger->LogInfo("V73LevelSystemPlugin", "v7.3 Level System activated successfully");
     
-    // Auto-load cyberpunk city level
-    m_logger->LogInfo("V73LevelSystemPlugin", "Auto-loading Cyberpunk City level...");
-    if (m_levelManager) {
-        // On Android, asset paths don't include "Assets/" prefix
-        bool loaded = m_levelManager->LoadLevel("levels/cyberpunk_city.json");
+    // NEW: Load chunk_0_full.json directly into the new Scene system
+    m_logger->LogInfo("V73LevelSystemPlugin", "Loading chunk_0_full.json into new ECS Scene...");
+    
+    auto* scene = m_core->GetScene();
+    if (scene) {
+        // Create scene loader
+        auto sceneLoader = std::make_unique<Levels::SceneLoader>(m_logger);
+        
+        // Load the chunk directly
+        bool loaded = sceneLoader->LoadChunkIntoScene(scene, "levels/chunks/chunk_0_full.json");
+        
         if (loaded) {
-            m_logger->LogInfo("V73LevelSystemPlugin", "Cyberpunk City loaded successfully!");
+            m_logger->LogInfo("V73LevelSystemPlugin", "chunk_0_full.json loaded into Scene successfully!");
+            
+            // Start the scene
+            scene->Play();
+            m_logger->LogInfo("V73LevelSystemPlugin", "Scene is now playing!");
+            
+            // Log scene stats
+            const auto& fastAccess = scene->GetFastAccess();
+            char msg[512];
+            snprintf(msg, sizeof(msg), "Scene stats: %zu entities, %zu meshes, %zu cameras, %zu lights",
+                     scene->GetAllEntities().size(),
+                     fastAccess.meshes.size(),
+                     fastAccess.cameras.size(),
+                     fastAccess.lights.size());
+            m_logger->LogInfo("V73LevelSystemPlugin", msg);
         } else {
-            m_logger->LogError("V73LevelSystemPlugin", "Failed to load Cyberpunk City");
+            m_logger->LogError("V73LevelSystemPlugin", "Failed to load chunk_0_full.json");
         }
+    } else {
+        m_logger->LogError("V73LevelSystemPlugin", "Scene not available from Core!");
     }
 }
 

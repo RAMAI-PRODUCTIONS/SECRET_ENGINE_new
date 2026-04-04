@@ -7,6 +7,7 @@
 #include <SecretEngine/ICore.h>
 #include <SecretEngine/IRenderer.h> // FIX: Resolve C2061 identifier 'IRenderer'
 #include <SecretEngine/IWorld.h>
+#include <SecretEngine/Scene.h> // NEW: Scene support
 #include <SecretEngine/IInputSystem.h>
 #include <SecretEngine/IAssetProvider.h>
 #include "SystemAllocator.h"
@@ -49,6 +50,7 @@ namespace SecretEngine {
             m_assetProvider = CreateAssetProvider(m_logger);
             m_pluginManager = new PluginManager();
             m_world = CreateWorld();
+            m_scene = new Scene("MainScene"); // NEW: Create main scene
             m_lastTime = std::chrono::high_resolution_clock::now();
             m_logger->LogInfo("Core", "SecretEngine Initializing...");
             
@@ -165,6 +167,7 @@ namespace SecretEngine {
                 m_pluginManager->UnloadAll();
                 delete m_pluginManager;
             }
+            if (m_scene) delete m_scene; // NEW: Delete scene
             if (m_world) delete m_world;
             if (m_assetProvider) delete m_assetProvider;
             delete m_logger;
@@ -174,6 +177,7 @@ namespace SecretEngine {
         IAllocator* GetAllocator(const char* name) override { return m_allocator; }
         ILogger* GetLogger() override { return m_logger; }
         IWorld* GetWorld() override { return m_world; }
+        Scene* GetScene() override { return m_scene; } // NEW: Get main scene
         IInputSystem* GetInput() override { 
             auto input = GetCapability("input");
             return input ? static_cast<IInputSystem*>(input->GetInterface(2)) : nullptr;
@@ -194,12 +198,13 @@ namespace SecretEngine {
         }
 
     private:
-        Core() : m_allocator(nullptr), m_logger(nullptr), m_assetProvider(nullptr), m_pluginManager(nullptr), m_world(nullptr), m_shouldClose(false), m_isRendererReady(false) {}
+        Core() : m_allocator(nullptr), m_logger(nullptr), m_assetProvider(nullptr), m_pluginManager(nullptr), m_world(nullptr), m_scene(nullptr), m_shouldClose(false), m_isRendererReady(false) {}
         SystemAllocator* m_allocator;
         Logger* m_logger;
         IAssetProvider* m_assetProvider;
         PluginManager* m_pluginManager;
         IWorld* m_world;
+        Scene* m_scene; // NEW: Main scene
         std::map<std::string, IPlugin*> m_capabilities;
         bool m_shouldClose; 
         bool m_isRendererReady;

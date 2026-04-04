@@ -10,6 +10,9 @@ add_library(SecretEngine_Core STATIC
     src/Entity.cpp
     src/World.cpp
     src/AssetProvider.cpp
+    src/EntityObject.cpp
+    src/ComponentsNew.cpp
+    src/Scene.cpp
 )
 
 target_include_directories(SecretEngine_Core

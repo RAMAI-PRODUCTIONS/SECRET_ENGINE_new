@@ -214,4 +214,8 @@ struct alignas(32) InstanceData {
 };
 static_assert(sizeof(InstanceData) == 64, "InstanceData must be 64 bytes for cache line alignment");
 
+// Type aliases for convenience
+using Vec3 = Float3;
+using Mat4 = Matrix4x4;
+
 } // namespace SecretEngine::Math

@@ -98,7 +98,7 @@ if(ANDROID)
         LevelSystem            # NEW: Level System
         FPSGameLogic           # NEW: FPS Game Logic
         FPSUIPlugin            # NEW: FPS UI
-        ProceduralCityPlugin   # NEW: Cyberpunk City Generation
+        # ProceduralCityPlugin   # DISABLED: Uses old API, not needed for new ECS demo
         ParticleSystemPlugin   # NEW: Particle Effects (Rain, Sparks, Dust)
         glm::glm
         android 

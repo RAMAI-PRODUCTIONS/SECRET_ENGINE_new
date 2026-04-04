@@ -30,6 +30,10 @@ add_library(LevelSystem STATIC
     src/TriggerSystem.h
     src/TriggerSystem.cpp
     
+    # NEW: Scene Loader for new ECS
+    include/SceneLoader.h
+    src/SceneLoader.cpp
+    
     # Advanced Streaming System
     src/Streaming/LevelStreamingSubsystem.h
     src/Streaming/LevelStreamingSubsystem.cpp
@@ -44,6 +48,7 @@ add_library(LevelSystem STATIC
 )
 
 target_include_directories(LevelSystem PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/v73
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Streaming

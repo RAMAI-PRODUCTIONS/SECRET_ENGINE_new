@@ -21,6 +21,7 @@ namespace SecretEngine {
         virtual IAllocator* GetAllocator(const char* name) = 0;
         virtual ILogger* GetLogger() = 0;
         virtual class IWorld* GetWorld() = 0;
+        virtual class Scene* GetScene() = 0; // NEW: Get the main scene
         virtual class IInputSystem* GetInput() = 0;
         virtual class IAssetProvider* GetAssetProvider() = 0;
         virtual void RegisterCapability(const char* name, IPlugin* plugin) = 0;
