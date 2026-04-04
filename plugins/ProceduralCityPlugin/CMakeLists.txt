@@ -9,7 +9,7 @@ target_include_directories(ProceduralCityPlugin PRIVATE
     ${CMAKE_SOURCE_DIR}/core/include
 )
 
-target_link_libraries(ProceduralCityPlugin PRIVATE core)
+target_link_libraries(ProceduralCityPlugin PRIVATE SecretEngine_Core)
 
 set_target_properties(ProceduralCityPlugin PROPERTIES
     CXX_STANDARD 20

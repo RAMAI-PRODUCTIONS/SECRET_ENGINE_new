@@ -1,9 +1,9 @@
 // SecretEngine - Particle System
 // Rain, sparks, dust for cyberpunk atmosphere
 
-#pragma once
 #include <SecretEngine/IPlugin.h>
 #include <SecretEngine/ICore.h>
+#include <SecretEngine/ILogger.h>
 #include <SecretEngine/IWorld.h>
 #include <SecretEngine/Components.h>
 #include <random>
@@ -29,6 +29,9 @@ public:
         m_core = core;
         m_logger = core->GetLogger();
         if (m_logger) m_logger->LogInfo("ParticleSystem", "💧 Particle System Loaded");
+        
+        // Register as a capability so OnActivate gets called
+        core->RegisterCapability("particle_system", this);
     }
 
     void OnActivate() override {

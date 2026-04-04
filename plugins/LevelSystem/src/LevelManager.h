@@ -76,6 +76,9 @@ public:
     void PrintLevelInfo() const;
     void PrintLevelHierarchy() const;
     
+    // Access to LevelLoader
+    LevelLoader* GetLevelLoader() { return m_levelLoader; }
+    
 private:
     ICore* m_core;
     IWorld* m_world;

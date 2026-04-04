@@ -25,13 +25,23 @@ void LevelSystemPlugin::OnLoad(ICore* core) {
 void LevelSystemPlugin::OnActivate() {
     m_logger->LogInfo("LevelSystem", "activated");
     
-    // Load level definitions
-    bool loaded = m_levelManager->LoadLevelDefinitions("data/LevelDefinitions.json");
-    if (loaded) {
-        m_logger->LogInfo("LevelSystem", "level definitions loaded successfully");
-        m_levelManager->PrintLevelInfo();
-    } else {
-        m_logger->LogWarning("LevelSystem", "no level definitions found (optional)");
+    // Directly load the cyberpunk city level using LevelLoader
+    m_logger->LogInfo("LevelSystem", "Loading cyberpunk city directly...");
+    
+    // Create a temporary level structure
+    Level tempLevel;
+    strncpy(tempLevel.definition.name, "CyberpunkCity", sizeof(tempLevel.definition.name) - 1);
+    strncpy(tempLevel.definition.path, "levels/cyberpunk_city.json", sizeof(tempLevel.definition.path) - 1);
+    tempLevel.state = LevelState::Unloaded;
+    
+    // Use LevelLoader to load the level data
+    if (m_levelManager && m_levelManager->GetLevelLoader()) {
+        bool loaded = m_levelManager->GetLevelLoader()->LoadLevelFromFile("levels/cyberpunk_city.json", &tempLevel);
+        if (loaded) {
+            m_logger->LogInfo("LevelSystem", "Cyberpunk city loaded successfully!");
+        } else {
+            m_logger->LogError("LevelSystem", "Failed to load cyberpunk city");
+        }
     }
 }
 
@@ -65,6 +75,7 @@ void LevelSystemPlugin::OnUpdate(float dt) {
 // Plugin factory implementation
 extern "C" {
     SecretEngine::IPlugin* CreateLevelSystemPlugin() {
+        // Use basic Level System for simplicity
         return new SecretEngine::Levels::LevelSystemPlugin();
     }
     

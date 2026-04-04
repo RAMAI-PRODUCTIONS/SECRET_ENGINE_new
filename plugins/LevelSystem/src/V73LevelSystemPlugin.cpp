@@ -29,34 +29,32 @@ void V73LevelSystemPlugin::OnLoad(ICore* core) {
 void V73LevelSystemPlugin::OnActivate() {
     m_logger->LogInfo("V73LevelSystemPlugin", "Activating v7.3 Level System...");
     
-    // Initialize streaming system
-    if (m_streamingEnabled) {
-        InitializeStreamingSystem();
-    }
-    
-    // Initialize network system
-    if (m_networkingEnabled) {
-        InitializeNetworkSystem();
-    }
+    // Disable streaming and networking for now - not needed for basic level loading
+    m_streamingEnabled = false;
+    m_networkingEnabled = false;
     
     // Setup event callbacks
     SetupEventCallbacks();
     
     m_logger->LogInfo("V73LevelSystemPlugin", "v7.3 Level System activated successfully");
+    
+    // Auto-load cyberpunk city level
+    m_logger->LogInfo("V73LevelSystemPlugin", "Auto-loading Cyberpunk City level...");
+    if (m_levelManager) {
+        // On Android, asset paths don't include "Assets/" prefix
+        bool loaded = m_levelManager->LoadLevel("levels/cyberpunk_city.json");
+        if (loaded) {
+            m_logger->LogInfo("V73LevelSystemPlugin", "Cyberpunk City loaded successfully!");
+        } else {
+            m_logger->LogError("V73LevelSystemPlugin", "Failed to load Cyberpunk City");
+        }
+    }
 }
 
 void V73LevelSystemPlugin::OnDeactivate() {
     m_logger->LogInfo("V73LevelSystemPlugin", "Deactivating v7.3 Level System...");
     
-    // Shutdown network system
-    if (m_networkingEnabled) {
-        Streaming::GNetworkedLevelStreamer.Shutdown();
-    }
-    
-    // Shutdown streaming system
-    if (m_streamingEnabled) {
-        Streaming::GLevelStreaming.Shutdown();
-    }
+    // Streaming and networking disabled
     
     // Unload current level
     if (m_levelManager) {
@@ -82,17 +80,7 @@ void V73LevelSystemPlugin::OnUpdate(float dt) {
     // Update level manager
     m_levelManager->Update(dt);
     
-    // Update streaming system
-    if (m_streamingEnabled) {
-        UpdatePlayerStreaming(dt);
-        Streaming::GLevelStreaming.Update(dt);
-    }
-    
-    // Update networking
-    if (m_networkingEnabled) {
-        UpdateNetworking(dt);
-        Streaming::GNetworkedLevelStreamer.Tick(dt);
-    }
+    // Streaming and networking disabled for now
     
     // Update performance metrics
     UpdatePerformanceMetrics(dt);
@@ -211,13 +199,7 @@ uint32_t V73LevelSystemPlugin::SpawnPlayer(const Player& playerData, const glm::
         // Track player position
         m_playerPositions[playerId] = position;
         
-        // Register with network system
-        if (m_networkingEnabled && m_isServer) {
-            Streaming::FPlayerStreamingData streamingData;
-            streamingData.PlayerId = playerId;
-            streamingData.Position = position;
-            Streaming::GNetworkedLevelStreamer.RegisterClient(playerId, streamingData);
-        }
+        // Networking disabled
         
         // Fire callback
         if (m_playerSpawnedCallback) {
@@ -236,15 +218,13 @@ uint32_t V73LevelSystemPlugin::SpawnPlayer(const Player& playerData, const glm::
 void V73LevelSystemPlugin::DespawnPlayer(uint32_t playerId) {
     if (!m_levelManager) return;
     
-    m_levelManager->DespawnPlayer(playerId);
+    // Note: DespawnPlayer not implemented in V73LevelManager yet
+    // m_levelManager->DespawnPlayer(playerId);
     
     // Remove from tracking
     m_playerPositions.erase(playerId);
     
-    // Unregister from network system
-    if (m_networkingEnabled && m_isServer) {
-        Streaming::GNetworkedLevelStreamer.UnregisterClient(playerId);
-    }
+    // Networking disabled
     
     char msg[256];
     snprintf(msg, sizeof(msg), "Despawned player %u", playerId);
@@ -254,20 +234,11 @@ void V73LevelSystemPlugin::DespawnPlayer(uint32_t playerId) {
 void V73LevelSystemPlugin::UpdatePlayerPosition(uint32_t playerId, const glm::vec3& position) {
     if (!m_levelManager) return;
     
-    m_levelManager->UpdatePlayerPosition(playerId, position);
+    // Note: UpdatePlayerPosition not implemented in V73LevelManager yet
+    // m_levelManager->UpdatePlayerPosition(playerId, position);
     m_playerPositions[playerId] = position;
     
-    // Send to network system
-    if (m_networkingEnabled) {
-        if (m_isServer) {
-            // Server: Update client streaming
-            std::vector<std::string> visibleChunks; // TODO: Calculate visible chunks
-            Streaming::GNetworkedLevelStreamer.UpdateClientStreaming(playerId, visibleChunks);
-        } else {
-            // Client: Send position to server
-            Streaming::GNetworkedLevelStreamer.SendPositionUpdate(position);
-        }
-    }
+    // Networking disabled
 }
 
 // ============================================================================
@@ -446,27 +417,6 @@ void V73LevelSystemPlugin::OnNetworkClientDisconnected(uint32_t clientId) {
     
     // Clean up player data
     DespawnPlayer(clientId);
-}
-
-// ============================================================================
-// Plugin Factory Functions
-// ============================================================================
-extern "C" {
-    PLUGIN_EXPORT IPlugin* CreatePlugin() {
-        return new V73LevelSystemPlugin();
-    }
-    
-    PLUGIN_EXPORT void DestroyPlugin(IPlugin* plugin) {
-        delete plugin;
-    }
-    
-    PLUGIN_EXPORT const char* GetPluginName() {
-        return "V73LevelSystem";
-    }
-    
-    PLUGIN_EXPORT uint32_t GetPluginVersion() {
-        return 73; // v7.3
-    }
 }
 
 } // namespace SecretEngine::Levels::V73

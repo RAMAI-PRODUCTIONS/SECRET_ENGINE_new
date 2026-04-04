@@ -1,10 +1,11 @@
 // SecretEngine - Procedural City Generator
 // Generates cyberpunk-style buildings with neon lights
 
-#pragma once
 #include <SecretEngine/IPlugin.h>
 #include <SecretEngine/ICore.h>
+#include <SecretEngine/ILogger.h>
 #include <SecretEngine/IWorld.h>
+#include <SecretEngine/IRenderer.h>
 #include <SecretEngine/Components.h>
 #include <random>
 #include <cmath>
@@ -27,10 +28,21 @@ public:
         m_core = core;
         m_logger = core->GetLogger();
         if (m_logger) m_logger->LogInfo("ProceduralCity", "🏙️ Procedural City Plugin Loaded");
+        
+        // Register as a capability so OnActivate gets called
+        core->RegisterCapability("procedural_city", this);
     }
 
     void OnActivate() override {
         if (m_logger) m_logger->LogInfo("ProceduralCity", "🏗️ Generating Cyberpunk City...");
+        
+        // Get renderer to submit instances
+        m_renderer = reinterpret_cast<IRenderer*>(m_core->GetCapability("rendering"));
+        if (!m_renderer) {
+            if (m_logger) m_logger->LogError("ProceduralCity", "Renderer not available!");
+            return;
+        }
+        
         GenerateCity();
     }
 
@@ -87,25 +99,16 @@ private:
     }
 
     void CreateGround(IWorld* world) {
-        Entity ground = world->CreateEntity();
+        // Submit ground plane directly to renderer
+        // Mesh slot 0 is typically the cube mesh
+        uint32_t meshSlot = 0;
         
-        TransformComponent transform;
-        transform.position[0] = 0.0f;
-        transform.position[1] = 0.0f;
-        transform.position[2] = -0.05f;
-        transform.scale[0] = 200.0f;
-        transform.scale[1] = 200.0f;
-        transform.scale[2] = 1.0f;
-        world->AddComponent(ground, TransformComponent::TypeID, &transform);
-        
-        MeshComponent mesh;
-        strncpy(mesh.meshPath, "meshes/cube.meshbin", sizeof(mesh.meshPath));
-        // Dark metallic ground
-        mesh.color[0] = 0.04f;
-        mesh.color[1] = 0.04f;
-        mesh.color[2] = 0.1f;
-        mesh.color[3] = 1.0f;
-        world->AddComponent(ground, MeshComponent::TypeID, &mesh);
+        // Ground at z=-0.05, scaled 200x200
+        m_renderer->AddInstance(meshSlot, 
+                               0.0f, 0.0f, -0.05f,  // position
+                               200.0f, 200.0f, 1.0f,  // scale
+                               0, // textureID
+                               0.04f, 0.04f, 0.1f, 1.0f); // dark metallic color
     }
 
     void CreateBuilding(IWorld* world, float x, float z, bool isTall, std::mt19937& gen) {
@@ -115,26 +118,17 @@ private:
         float width = isTall ? 4.2f : (2.8f + randFloat(gen) * 3.5f);
         float depth = isTall ? 4.2f : (2.8f + randFloat(gen) * 3.5f);
         
+        uint32_t meshSlot = 0; // cube mesh
+        
         // Main building
-        Entity building = world->CreateEntity();
-        
-        TransformComponent transform;
-        transform.position[0] = x;
-        transform.position[1] = z;
-        transform.position[2] = height / 2.0f;
-        transform.scale[0] = width;
-        transform.scale[1] = depth;
-        transform.scale[2] = height;
-        world->AddComponent(building, TransformComponent::TypeID, &transform);
-        
-        MeshComponent mesh;
-        strncpy(mesh.meshPath, "meshes/cube.meshbin", sizeof(mesh.meshPath));
-        // Dark building color
-        mesh.color[0] = 0.08f + randFloat(gen) * 0.05f;
-        mesh.color[1] = 0.12f + randFloat(gen) * 0.05f;
-        mesh.color[2] = 0.17f + randFloat(gen) * 0.05f;
-        mesh.color[3] = 1.0f;
-        world->AddComponent(building, MeshComponent::TypeID, &mesh);
+        m_renderer->AddInstance(meshSlot,
+                               x, z, height / 2.0f,  // position
+                               width, depth, height,  // scale
+                               0,  // textureID
+                               0.08f + randFloat(gen) * 0.05f,  // dark building color
+                               0.12f + randFloat(gen) * 0.05f,
+                               0.17f + randFloat(gen) * 0.05f,
+                               1.0f);
         
         // Add neon window strips
         int windowRows = static_cast<int>(height / 1.2f);
@@ -162,65 +156,36 @@ private:
                         float width, float height, float offset, bool horizontal, std::mt19937& gen) {
         std::uniform_real_distribution<float> randFloat(0.0f, 1.0f);
         
-        Entity strip = world->CreateEntity();
+        uint32_t meshSlot = 0;
         
-        TransformComponent transform;
-        transform.position[0] = x + (horizontal ? 0 : offset);
-        transform.position[1] = z + (horizontal ? offset : 0);
-        transform.position[2] = y;
-        transform.scale[0] = horizontal ? width : 0.05f;
-        transform.scale[1] = horizontal ? 0.05f : width;
-        transform.scale[2] = height;
-        world->AddComponent(strip, TransformComponent::TypeID, &transform);
-        
-        MeshComponent mesh;
-        strncpy(mesh.meshPath, "meshes/cube.meshbin", sizeof(mesh.meshPath));
-        // Bright neon orange/yellow
-        mesh.color[0] = 1.0f;
-        mesh.color[1] = 0.67f + randFloat(gen) * 0.2f;
-        mesh.color[2] = 0.4f;
-        mesh.color[3] = 1.0f;
-        world->AddComponent(strip, MeshComponent::TypeID, &mesh);
+        m_renderer->AddInstance(meshSlot,
+                               x + (horizontal ? 0 : offset),
+                               z + (horizontal ? offset : 0),
+                               y,
+                               horizontal ? width : 0.05f,
+                               horizontal ? 0.05f : width,
+                               height,
+                               0,  // textureID
+                               1.0f,  // bright neon orange/yellow
+                               0.67f + randFloat(gen) * 0.2f,
+                               0.4f,
+                               1.0f);
     }
 
     void CreateBeacon(IWorld* world, float x, float z, float y, std::mt19937& gen) {
-        Entity beacon = world->CreateEntity();
+        uint32_t meshSlot = 0;
         
-        TransformComponent transform;
-        transform.position[0] = x;
-        transform.position[1] = z;
-        transform.position[2] = y;
-        transform.scale[0] = 0.4f;
-        transform.scale[1] = 0.4f;
-        transform.scale[2] = 0.8f;
-        world->AddComponent(beacon, TransformComponent::TypeID, &transform);
-        
-        MeshComponent mesh;
-        strncpy(mesh.meshPath, "meshes/cube.meshbin", sizeof(mesh.meshPath));
-        // Bright pink/magenta
-        mesh.color[0] = 1.0f;
-        mesh.color[1] = 0.2f;
-        mesh.color[2] = 0.4f;
-        mesh.color[3] = 1.0f;
-        world->AddComponent(beacon, MeshComponent::TypeID, &mesh);
+        m_renderer->AddInstance(meshSlot,
+                               x, z, y,
+                               0.4f, 0.4f, 0.8f,  // scale
+                               0,  // textureID
+                               1.0f, 0.2f, 0.4f, 1.0f);  // bright pink/magenta
     }
 
     void CreateBillboard(IWorld* world, float x, float z, float y, std::mt19937& gen) {
         std::uniform_int_distribution<int> colorChoice(0, 3);
         
-        Entity billboard = world->CreateEntity();
-        
-        TransformComponent transform;
-        transform.position[0] = x;
-        transform.position[1] = z;
-        transform.position[2] = y;
-        transform.scale[0] = 2.2f;
-        transform.scale[1] = 0.1f;
-        transform.scale[2] = 1.2f;
-        world->AddComponent(billboard, TransformComponent::TypeID, &transform);
-        
-        MeshComponent mesh;
-        strncpy(mesh.meshPath, "meshes/cube.meshbin", sizeof(mesh.meshPath));
+        uint32_t meshSlot = 0;
         
         // Random neon colors
         float colors[][3] = {
@@ -230,15 +195,20 @@ private:
             {0.67f, 0.27f, 1.0f}  // Purple
         };
         int choice = colorChoice(gen);
-        mesh.color[0] = colors[choice][0];
-        mesh.color[1] = colors[choice][1];
-        mesh.color[2] = colors[choice][2];
-        mesh.color[3] = 0.9f;
-        world->AddComponent(billboard, MeshComponent::TypeID, &mesh);
+        
+        m_renderer->AddInstance(meshSlot,
+                               x, z, y,
+                               2.2f, 0.1f, 1.2f,  // scale
+                               0,  // textureID
+                               colors[choice][0],
+                               colors[choice][1],
+                               colors[choice][2],
+                               0.9f);
     }
 
     ICore* m_core = nullptr;
     ILogger* m_logger = nullptr;
+    IRenderer* m_renderer = nullptr;
     float m_time = 0.0f;
 };
 

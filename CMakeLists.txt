@@ -93,11 +93,13 @@ if(ANDROID)
         GameLogic      
         CameraPlugin   
         DebugPlugin
-        PhysicsPlugin      # NEW: FPS Physics
-        GameplayTagSystem  # NEW: Gameplay Tag System
-        LevelSystem        # NEW: Level System
-        FPSGameLogic       # NEW: FPS Game Logic
-        FPSUIPlugin        # NEW: FPS UI
+        PhysicsPlugin          # NEW: FPS Physics
+        GameplayTagSystem      # NEW: Gameplay Tag System
+        LevelSystem            # NEW: Level System
+        FPSGameLogic           # NEW: FPS Game Logic
+        FPSUIPlugin            # NEW: FPS UI
+        ProceduralCityPlugin   # NEW: Cyberpunk City Generation
+        ParticleSystemPlugin   # NEW: Particle Effects (Rain, Sparks, Dust)
         glm::glm
         android 
         log

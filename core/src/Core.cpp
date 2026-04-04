@@ -26,6 +26,8 @@ extern "C" SecretEngine::IPlugin* CreateGameplayTagPlugin();
 extern "C" SecretEngine::IPlugin* CreateLevelSystemPlugin();
 extern "C" SecretEngine::IPlugin* CreateFPSGamePlugin();
 extern "C" SecretEngine::IPlugin* CreateFPSUIPlugin();
+extern "C" SecretEngine::IPlugin* CreateProceduralCityPlugin();
+extern "C" SecretEngine::IPlugin* CreateParticleSystemPlugin();
 #endif
 
 #include <chrono>
@@ -99,6 +101,16 @@ namespace SecretEngine {
             IPlugin* fpsUI = CreateFPSUIPlugin();
             if (fpsUI) {
                 fpsUI->OnLoad(this);
+            }
+
+            IPlugin* proceduralCity = CreateProceduralCityPlugin();
+            if (proceduralCity) {
+                proceduralCity->OnLoad(this);
+            }
+
+            IPlugin* particleSystem = CreateParticleSystemPlugin();
+            if (particleSystem) {
+                particleSystem->OnLoad(this);
             }
 
             // Activate all loaded plugins

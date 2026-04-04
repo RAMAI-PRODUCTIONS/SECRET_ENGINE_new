@@ -9,7 +9,7 @@ target_include_directories(ParticleSystemPlugin PRIVATE
     ${CMAKE_SOURCE_DIR}/core/include
 )
 
-target_link_libraries(ParticleSystemPlugin PRIVATE core)
+target_link_libraries(ParticleSystemPlugin PRIVATE SecretEngine_Core)
 
 set_target_properties(ParticleSystemPlugin PROPERTIES
     CXX_STANDARD 20

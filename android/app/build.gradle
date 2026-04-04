@@ -7,6 +7,14 @@ android {
     compileSdk 35
     ndkVersion "29.0.14206865"
 
+    sourceSets {
+        main {
+            // Include both Assets and data folders in the APK
+            assets.srcDirs = ['../../Assets', '../../data']
+            // This will make Assets/* and data/* available at the root of the APK assets
+        }
+    }
+
     defaultConfig {
         applicationId "com.secretengine.game"
         minSdk 26
@@ -20,8 +28,8 @@ android {
             }
         }
         ndk {
-            // Build for modern Android phones (ARM64) and PC Emulators (x86_64)
-            abiFilters 'arm64-v8a', 'x86_64'
+            // Build for modern Android phones (ARM64) only for faster builds
+            abiFilters 'arm64-v8a'
         }
     }
 

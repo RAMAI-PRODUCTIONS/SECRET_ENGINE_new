@@ -2,11 +2,23 @@
   "version": "1.0.0",
   "levels": [
     {
+      "name": "CyberpunkCity",
+      "path": "Assets/levels/cyberpunk_city.json",
+      "type": "persistent",
+      "streamingMethod": "always",
+      "autoLoad": true,
+      "makeVisibleAfterLoad": true,
+      "bounds": {
+        "center": [0, 0, 0],
+        "extents": [100, 100, 100]
+      }
+    },
+    {
       "name": "LevelOne",
       "path": "Assets/levels/level_one.json",
       "type": "persistent",
       "streamingMethod": "always",
-      "autoLoad": true,
+      "autoLoad": false,
       "makeVisibleAfterLoad": true,
       "bounds": {
         "center": [20, 0, 10],
