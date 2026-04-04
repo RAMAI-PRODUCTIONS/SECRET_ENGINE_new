@@ -1,0 +1,6 @@
+{
+  "name": "ParticleSystemPlugin",
+  "version": "1.0.0",
+  "description": "Particle system for rain, sparks, and atmospheric effects",
+  "dependencies": ["core"]
+}

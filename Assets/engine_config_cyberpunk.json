@@ -1,0 +1,60 @@
+{
+  "engine_name": "SecretEngine",
+  "version": "1.0.0",
+  "startup": {
+    "level": "levels/cyberpunk_city.json",
+    "ui_config": "ui_cyberpunk.json",
+    "plugins": [
+      "VulkanRenderer",
+      "CameraPlugin",
+      "AndroidInput",
+      "ProceduralCityPlugin",
+      "ParticleSystemPlugin",
+      "LightingSystem",
+      "MaterialSystem",
+      "TextureSystem"
+    ]
+  },
+  "rendering": {
+    "backend": "vulkan",
+    "vsync": true,
+    "msaa_samples": 4,
+    "anisotropic_filtering": 16,
+    "shadow_quality": "medium",
+    "target_fps": 60
+  },
+  "camera": {
+    "fov": 75.0,
+    "near_plane": 0.05,
+    "far_plane": 500.0,
+    "move_speed": 12.0,
+    "look_sensitivity": 0.3
+  },
+  "particles": {
+    "max_particles": 10600,
+    "rain_enabled": true,
+    "sparks_enabled": true,
+    "dust_enabled": true
+  },
+  "city_generation": {
+    "seed": 42,
+    "building_density": 0.92,
+    "min_building_height": 8.0,
+    "max_building_height": 30.0,
+    "city_radius": 42.0,
+    "building_spacing": 6.5
+  },
+  "atmosphere": {
+    "fog_enabled": true,
+    "fog_density": 0.025,
+    "fog_color": [0.02, 0.04, 0.1],
+    "ambient_color": [0.07, 0.07, 0.13],
+    "sky_color": [0.02, 0.04, 0.1]
+  },
+  "debug": {
+    "show_fps": true,
+    "show_particle_count": false,
+    "wireframe": false,
+    "log_level": "info"
+  }
+}

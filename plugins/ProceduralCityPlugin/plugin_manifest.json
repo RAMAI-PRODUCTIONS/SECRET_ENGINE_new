@@ -1,0 +1,6 @@
+{
+  "name": "ProceduralCityPlugin",
+  "version": "1.0.0",
+  "description": "Generates cyberpunk city buildings procedurally",
+  "dependencies": ["core"]
+}

@@ -15,6 +15,10 @@ add_subdirectory(LevelSystem)
 add_subdirectory(FPSGameLogic)
 add_subdirectory(FPSUIPlugin)
 
+# Cyberpunk City Demo Plugins
+add_subdirectory(ProceduralCityPlugin)
+add_subdirectory(ParticleSystemPlugin)
+
 if(ANDROID)
     add_subdirectory(AndroidInput)
     add_subdirectory(GameLogic)

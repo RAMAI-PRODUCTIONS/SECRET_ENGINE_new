@@ -15,10 +15,6 @@ glslc plugins/VulkanRenderer/shaders/basic3d.frag -o android/app/src/main/assets
 REM Compute Shaders
 glslc plugins/VulkanRenderer/shaders/cull.comp -o android/app/src/main/assets/shaders/cull_comp.spv
 
-REM UI Shaders
-glslc plugins/VulkanRenderer/shaders/ui.vert -o android/app/src/main/assets/shaders/ui_vert.spv
-glslc plugins/VulkanRenderer/shaders/ui.frag -o android/app/src/main/assets/shaders/ui_frag.spv
-
 REM Simple 2D Shaders
 glslc plugins/VulkanRenderer/shaders/simple2d.vert -o android/app/src/main/assets/shaders/simple2d_vert.spv
 glslc plugins/VulkanRenderer/shaders/simple2d.frag -o android/app/src/main/assets/shaders/simple2d_frag.spv
@@ -26,5 +22,9 @@ glslc plugins/VulkanRenderer/shaders/simple2d.frag -o android/app/src/main/asset
 REM Triangle Shaders
 glslc plugins/VulkanRenderer/shaders/triangle.vert -o android/app/src/main/assets/shaders/triangle_vert.spv
 glslc plugins/VulkanRenderer/shaders/triangle.frag -o android/app/src/main/assets/shaders/triangle_frag.spv
+
+REM Particle Shaders (Cyberpunk City)
+glslc -fshader-stage=vertex plugins/VulkanRenderer/shaders/particle_vert.glsl -o android/app/src/main/assets/shaders/particle_vert.spv
+glslc -fshader-stage=fragment plugins/VulkanRenderer/shaders/particle_frag.glsl -o android/app/src/main/assets/shaders/particle_frag.spv
 
 echo Shader compilation complete!

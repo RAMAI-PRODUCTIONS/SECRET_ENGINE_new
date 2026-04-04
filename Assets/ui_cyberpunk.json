@@ -1,0 +1,100 @@
+{
+  "ui_config_name": "Cyberpunk City Controls",
+  "description": "Touch controls for cyberpunk city exploration",
+  "elements": [
+    {
+      "type": "joystick",
+      "id": "movement_stick",
+      "position": {
+        "x": 120,
+        "y": 880,
+        "anchor": "bottom_left"
+      },
+      "size": {
+        "outer_radius": 100,
+        "inner_radius": 40
+      },
+      "color": {
+        "outer": [0.0, 1.0, 1.0, 0.3],
+        "inner": [1.0, 0.0, 0.67, 0.6]
+      },
+      "deadzone": 0.15,
+      "action": "move"
+    },
+    {
+      "type": "touchpad",
+      "id": "look_area",
+      "position": {
+        "x": 540,
+        "y": 0,
+        "anchor": "top_left"
+      },
+      "size": {
+        "width": 540,
+        "height": 1080
+      },
+      "sensitivity": 0.3,
+      "action": "look"
+    },
+    {
+      "type": "button",
+      "id": "jump_button",
+      "position": {
+        "x": 950,
+        "y": 880,
+        "anchor": "bottom_right"
+      },
+      "size": {
+        "width": 80,
+        "height": 80
+      },
+      "color": [0.0, 1.0, 1.0, 0.5],
+      "text": "↑",
+      "text_color": [1.0, 1.0, 1.0, 1.0],
+      "action": "jump"
+    },
+    {
+      "type": "label",
+      "id": "title",
+      "position": {
+        "x": 540,
+        "y": 50,
+        "anchor": "top_center"
+      },
+      "text": "⚡ CYBERPUNK DISTRICT 2077 ⚡",
+      "color": [0.0, 1.0, 1.0, 0.9],
+      "font_size": 24,
+      "background": {
+        "enabled": true,
+        "color": [0.0, 0.0, 0.0, 0.7],
+        "padding": 15,
+        "border_color": [1.0, 0.0, 0.8, 1.0],
+        "border_width": 3
+      }
+    },
+    {
+      "type": "label",
+      "id": "controls_tip",
+      "position": {
+        "x": 1030,
+        "y": 1030,
+        "anchor": "bottom_right"
+      },
+      "text": "🎮 Touch to move | Swipe to look",
+      "color": [1.0, 0.4, 0.8, 0.9],
+      "font_size": 14,
+      "background": {
+        "enabled": true,
+        "color": [0.0, 0.0, 0.0, 0.6],
+        "padding": 10,
+        "border_color": [0.0, 1.0, 1.0, 1.0],
+        "border_width": 2
+      }
+    }
+  ],
+  "theme": {
+    "primary_color": [0.0, 1.0, 1.0, 1.0],
+    "secondary_color": [1.0, 0.0, 0.67, 1.0],
+    "background_color": [0.02, 0.04, 0.1, 0.8]
+  }
+}
