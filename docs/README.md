@@ -25,3 +25,5 @@ Welcome to the SecretEngine documentation. This directory contains comprehensive
 ## Contributing to Documentation
 
 All documentation files should be placed in appropriate subdirectories. The root `docs/` folder should only contain this README file.
+
+See [Contributing Guidelines](./foundation/CONTRIBUTING.md) for detailed documentation structure rules and guidelines.

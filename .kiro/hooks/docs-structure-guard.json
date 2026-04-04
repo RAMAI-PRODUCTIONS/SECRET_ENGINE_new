@@ -1,0 +1,13 @@
+{
+  "name": "Docs Structure Guard",
+  "version": "1.0.0",
+  "description": "Ensures only README.md files are allowed in the root docs/ folder. All other markdown files must be in subdirectories.",
+  "when": {
+    "type": "fileCreated",
+    "patterns": ["docs/*.md", "docs/*.html"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file was just created in the root docs/ folder. According to project rules, only README.md is allowed in docs/. All other documentation files must be placed in appropriate subdirectories (architecture/, features/, guides/, reference/, implementation/, fixes/, research/, status/, planning/, foundation/). Please move this file to the correct subdirectory or inform the user if it's README.md."
+  }
+}

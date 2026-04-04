@@ -1,0 +1,13 @@
+{
+  "name": "Docs Edit Guard",
+  "version": "1.0.0",
+  "description": "Warns when editing files in root docs/ folder that should be in subdirectories",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["docs/*.md", "docs/*.html"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file in the root docs/ folder was edited. Verify this is README.md. If it's any other file, remind the user that only README.md should exist in docs/ root, and suggest moving it to an appropriate subdirectory."
+  }
+}
