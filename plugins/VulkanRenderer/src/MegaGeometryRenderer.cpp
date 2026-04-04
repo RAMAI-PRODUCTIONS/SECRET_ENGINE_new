@@ -26,7 +26,7 @@ void MegaGeometryRenderer::UpdateInstanceTransform(uint32_t instanceID, float x,
     if (instanceID >= MAX_INSTANCES) return;
 
     // ULTRA-FAST MATRIX: Direct write for Y-rotation only (common case)
-    // Eliminates 90% of trig calls and matrix multiplications
+    // Z-UP COORDINATE SYSTEM: Y-rotation rotates in XY plane (around Z axis)
     if (rotX == 0.0f && rotZ == 0.0f) {
         float cy = cosf(rotY), sy = sinf(rotY);
         const float s = 150.0f;
@@ -34,12 +34,12 @@ void MegaGeometryRenderer::UpdateInstanceTransform(uint32_t instanceID, float x,
         for(int i=0; i<2; ++i) {
             if (m_instanceDataMapped[i]) {
                 auto& t = m_instanceDataMapped[i][instanceID].transform;
-                // Row 0: [cy*s, 0, sy*s, x]
-                t.m[0] = cy * s; t.m[1] = 0.0f; t.m[2] = sy * s; t.m[3] = x;
-                // Row 1: [0, s, 0, y]
-                t.m[4] = 0.0f; t.m[5] = s; t.m[6] = 0.0f; t.m[7] = y;
-                // Row 2: [-sy*s, 0, cy*s, z]
-                t.m[8] = -sy * s; t.m[9] = 0.0f; t.m[10] = cy * s; t.m[11] = z;
+                // Row 0 (X-axis / right): [cy*s, -sy*s, 0, x]
+                t.m[0] = cy * s; t.m[1] = -sy * s; t.m[2] = 0.0f; t.m[3] = x;
+                // Row 1 (Y-axis / forward): [sy*s, cy*s, 0, y]
+                t.m[4] = sy * s; t.m[5] = cy * s; t.m[6] = 0.0f; t.m[7] = y;
+                // Row 2 (Z-axis / up): [0, 0, s, z]
+                t.m[8] = 0.0f; t.m[9] = 0.0f; t.m[10] = s; t.m[11] = z;
             }
         }
     } else {

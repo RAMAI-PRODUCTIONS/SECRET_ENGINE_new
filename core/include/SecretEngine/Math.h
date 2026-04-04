@@ -86,6 +86,7 @@ struct alignas(16) Matrix4x4 {
     SE_MATH_INLINE static Matrix4x4 RotationX(float a) noexcept {
         Matrix4x4 res = Identity();
         float c = cosf(a), s = sinf(a);
+        // X-rotation (pitch) - same for both Y-up and Z-up
         res.m[5] = c; res.m[6] = s; res.m[9] = -s; res.m[10] = c;
         return res;
     }
@@ -93,13 +94,15 @@ struct alignas(16) Matrix4x4 {
     SE_MATH_INLINE static Matrix4x4 RotationY(float a) noexcept {
         Matrix4x4 res = Identity();
         float c = cosf(a), s = sinf(a);
-        res.m[0] = c; res.m[2] = -s; res.m[8] = s; res.m[10] = c;
+        // Y-rotation (yaw around Z-up) - rotates in XY plane
+        res.m[0] = c; res.m[1] = s; res.m[4] = -s; res.m[5] = c;
         return res;
     }
 
     SE_MATH_INLINE static Matrix4x4 RotationZ(float a) noexcept {
         Matrix4x4 res = Identity();
         float c = cosf(a), s = sinf(a);
+        // Z-rotation (roll around forward axis) - rotates around Z (up)
         res.m[0] = c; res.m[1] = s; res.m[4] = -s; res.m[5] = c;
         return res;
     }
@@ -111,60 +114,59 @@ struct alignas(16) Matrix4x4 {
     }
 
     // ULTRA-FAST TRS: Optimized for common case (Y-axis rotation only)
-    // Eliminates 12 trig calls and 30+ multiplications per instance
+    // Z-UP COORDINATE SYSTEM: Z is up, Y is forward, X is right
+    // Rotation order: YXZ (yaw, pitch, roll)
     SE_MATH_INLINE static void FromTRS(Matrix3x4& out, float tx, float ty, float tz, float rx, float ry, float rz, float s) noexcept {
         // Fast path: Y-rotation only (most common in games)
         if (rx == 0.0f && rz == 0.0f) {
             float cy = cosf(ry), sy = sinf(ry);
-            float ss = s; // Pre-scaled
+            float ss = s;
             
-            // Row 0: [cy*s, 0, sy*s, tx]
+            // Z-up Y-rotation: rotates in XY plane (around Z axis)
+            // Row 0: [cy*s, -sy*s, 0, tx]
             out.m[0] = cy * ss;
-            out.m[1] = 0.0f;
-            out.m[2] = sy * ss;
+            out.m[1] = -sy * ss;
+            out.m[2] = 0.0f;
             out.m[3] = tx;
             
-            // Row 1: [0, s, 0, ty]
-            out.m[4] = 0.0f;
-            out.m[5] = ss;
+            // Row 1: [sy*s, cy*s, 0, ty]
+            out.m[4] = sy * ss;
+            out.m[5] = cy * ss;
             out.m[6] = 0.0f;
             out.m[7] = ty;
             
-            // Row 2: [-sy*s, 0, cy*s, tz]
-            out.m[8] = -sy * ss;
+            // Row 2: [0, 0, s, tz]
+            out.m[8] = 0.0f;
             out.m[9] = 0.0f;
-            out.m[10] = cy * ss;
+            out.m[10] = ss;
             out.m[11] = tz;
             return;
         }
         
-        // Full path: All rotations (fallback)
+        // Full path: All rotations (YXZ order for Z-up)
         float cx = cosf(rx), sx = sinf(rx);
         float cy = cosf(ry), sy = sinf(ry);
         float cz = cosf(rz), sz = sinf(rz);
         
-        // Pre-compute common terms
-        float sxsy = sx * sy;
-        float cxsy = cx * sy;
-        float cycz = cy * cz;
-        float cysz = cy * sz;
-
-        // Row 0
-        out.m[0] = cycz * s;
-        out.m[1] = -cysz * s;
-        out.m[2] = sy * s;
+        // YXZ rotation order for Z-up coordinate system
+        // Y rotates around Z (up), X rotates around X (right), Z rotates around Y (forward)
+        
+        // Row 0 (X-axis / right)
+        out.m[0] = (cy * cz + sy * sx * sz) * s;
+        out.m[1] = (-cy * sz + sy * sx * cz) * s;
+        out.m[2] = sy * cx * s;
         out.m[3] = tx;
 
-        // Row 1
-        out.m[4] = (sxsy * cz + cx * sz) * s;
-        out.m[5] = (-sxsy * sz + cx * cz) * s;
-        out.m[6] = -sx * cy * s;
+        // Row 1 (Y-axis / forward)
+        out.m[4] = cx * sz * s;
+        out.m[5] = cx * cz * s;
+        out.m[6] = -sx * s;
         out.m[7] = ty;
 
-        // Row 2
-        out.m[8] = (-cxsy * cz + sx * sz) * s;
-        out.m[9] = (cxsy * sz + sx * cz) * s;
-        out.m[10] = cx * cy * s;
+        // Row 2 (Z-axis / up)
+        out.m[8] = (-sy * cz + cy * sx * sz) * s;
+        out.m[9] = (sy * sz + cy * sx * cz) * s;
+        out.m[10] = cy * cx * s;
         out.m[11] = tz;
     }
     
