@@ -184,15 +184,19 @@ void MegaGeometryRenderer::Render(VkCommandBuffer cmd) {
     // 4. Draw
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-    // Bind descriptor sets: set 0 = instances only
-    VkDescriptorSet sets[1] = { m_descriptorSet[m_frameIndex] };
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, sets, 0, nullptr);
-    
+    // Bind descriptor sets: set 0 = instances, set 1 = lights (if available)
+    VkDescriptorSet sets[2] = { m_descriptorSet[m_frameIndex], m_lightDescriptorSet };
+    uint32_t setCount = (m_lightDescriptorSet != VK_NULL_HANDLE) ? 2 : 1;
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, setCount, sets, 0, nullptr);    
     if (m_vertexBuffer != VK_NULL_HANDLE) {
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &m_vertexBuffer, &offset);
         vkCmdBindIndexBuffer(cmd, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-        vkCmdPushConstants(cmd, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, m_viewProj);
+        // Push VP (64 bytes) + lightCount (4 bytes) = 68 bytes, both stages
+        struct { float vp[16]; uint32_t lightCount; } pushData;
+        memcpy(pushData.vp, m_viewProj, 64);
+        pushData.lightCount = m_lightCount;
+        vkCmdPushConstants(cmd, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, 68, &pushData);
         vkCmdDrawIndexedIndirect(cmd, m_indirectBuffer[m_frameIndex], 0, 1, sizeof(VkDrawIndexedIndirectCommand));
     }
 }
@@ -475,15 +479,15 @@ bool MegaGeometryRenderer::CreatePipeline(VkRenderPass renderPass) {
     cba.blendEnable = VK_FALSE;
     VkPipelineColorBlendStateCreateInfo cb = {VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO}; cb.attachmentCount = 1; cb.pAttachments = &cba;
     
-    VkPushConstantRange push = {VK_SHADER_STAGE_VERTEX_BIT, 0, 64};
+    VkPushConstantRange push = {VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, 68};
     VkPipelineLayoutCreateInfo pl = {VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
 
-    // set 0: instance SSBO only (no texture dependency - textures disabled on this device)
-    VkDescriptorSetLayout setLayouts[1] = { m_descriptorSetLayout };
-    uint32_t setLayoutCount = 1;
+    // set 0: instance SSBO (vertex), set 1: light SSBO (fragment)
+    // Both layouts are always valid — light descriptor is written in SetLightBuffer
+    VkDescriptorSetLayout setLayouts[2] = { m_descriptorSetLayout, m_lightDescriptorLayout };
+    uint32_t setLayoutCount = (m_lightDescriptorLayout != VK_NULL_HANDLE) ? 2 : 1;
     pl.setLayoutCount = setLayoutCount;
-    pl.pSetLayouts = setLayouts;
-    pl.pushConstantRangeCount = 1;
+    pl.pSetLayouts = setLayouts;    pl.pushConstantRangeCount = 1;
     pl.pPushConstantRanges = &push;
     VkResult res = vkCreatePipelineLayout(m_vkDevice, &pl, nullptr, &m_pipelineLayout);
     if (res != VK_SUCCESS) {

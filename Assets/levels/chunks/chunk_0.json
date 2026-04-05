@@ -2,7 +2,7 @@
   "chunk_id": "chunk_0",
   "mesh_groups": [
     {
-      "mesh": "meshes/wall.meshbin",
+      "mesh": "meshes/character.meshbin",
       "material": "default.mat",
       "instances": [
         {

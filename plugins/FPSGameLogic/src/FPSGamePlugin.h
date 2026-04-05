@@ -89,7 +89,7 @@ private:
     std::vector<MovingLight> m_movingLights;
     
     // Particle mesh path (small cube used as light orb)
-    static constexpr const char* PARTICLE_MESH = "meshes/wall.meshbin";
+    static constexpr const char* PARTICLE_MESH = "meshes/Character.meshbin";
     static constexpr float PARTICLE_SCALE = 8.0f;  // small orb
     
     void RegisterComponents();
