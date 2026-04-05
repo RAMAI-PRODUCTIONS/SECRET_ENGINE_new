@@ -270,73 +270,63 @@ void FPSGamePlugin::SpawnLightParticles(SecretEngine::IRenderer* renderer) {
     m_logger->LogInfo("FPSGameLogic", buf);
 }
 
-// Forward+ inspired: Update moving lights each frame
+// Parallel light simulation using JobSystem + FDA packets
 void FPSGamePlugin::UpdateMovingLights(float deltaTime) {
+    if (m_movingLights.empty()) return;
+
     auto* lightingPlugin = m_core->GetCapability("lighting");
     if (!lightingPlugin) return;
     auto* lightingSystem = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
     if (!lightingSystem) return;
 
-    // Get renderer for particle updates
-    auto* rendererPlugin = m_core->GetCapability("rendering");
-    SecretEngine::IRenderer* renderer = rendererPlugin
-        ? static_cast<SecretEngine::IRenderer*>(rendererPlugin->GetInterface(1))
-        : nullptr;
+    uint32_t count = (uint32_t)m_movingLights.size();
 
-    m_gameTime += 0.0f; // already tracked in OnUpdate
-    
-    for (auto& light : m_movingLights) {
+    // Use ParallelFor to simulate lights on worker threads
+    SecretEngine::ParallelFor(count, [this, deltaTime, lightingSystem](uint32_t i) {
+        auto& light = m_movingLights[i];
+
         // Move
         light.position[0] += light.velocity[0] * light.speed * deltaTime;
         light.position[1] += light.velocity[1] * light.speed * deltaTime;
         light.position[2] += light.velocity[2] * light.speed * deltaTime;
-        
-        // Bounce off boundaries
-        const float boundary = 15.0f;
-        if (light.position[0] < -boundary || light.position[0] > boundary) {
-            light.velocity[0] *= -1.0f;
-            light.position[0] = std::clamp(light.position[0], -boundary, boundary);
-        }
-        if (light.position[1] < 1.0f || light.position[1] > 8.0f) {
-            light.velocity[1] *= -1.0f;
-            light.position[1] = std::clamp(light.position[1], 1.0f, 8.0f);
-        }
-        if (light.position[2] < -boundary || light.position[2] > boundary) {
-            light.velocity[2] *= -1.0f;
-            light.position[2] = std::clamp(light.position[2], -boundary, boundary);
-        }
 
-        // Pulse colour over time
+        // Bounce
+        const float B = 15.0f;
+        if (light.position[0] < -B || light.position[0] > B) { light.velocity[0] *= -1.f; light.position[0] = std::clamp(light.position[0], -B, B); }
+        if (light.position[1] < 1.f || light.position[1] > 8.f) { light.velocity[1] *= -1.f; light.position[1] = std::clamp(light.position[1], 1.f, 8.f); }
+        if (light.position[2] < -B || light.position[2] > B) { light.velocity[2] *= -1.f; light.position[2] = std::clamp(light.position[2], -B, B); }
+
+        // Pulse colour
         light.rotPhase += deltaTime * 1.5f;
         float pulse = 0.7f + 0.3f * sinf(light.rotPhase);
         float pr = light.color[0] * pulse;
         float pg = light.color[1] * pulse;
         float pb = light.color[2] * pulse;
 
-        // Update light in system
-        SecretEngine::LightData updatedLight;
-        updatedLight.type = SecretEngine::LightData::Point;
-        updatedLight.position[0] = light.position[0];
-        updatedLight.position[1] = light.position[1];
-        updatedLight.position[2] = light.position[2];
-        updatedLight.color[0] = pr;
-        updatedLight.color[1] = pg;
-        updatedLight.color[2] = pb;
-        updatedLight.intensity = 2.0f;
-        updatedLight.range = light.radius;
-        updatedLight.constantAttenuation = 1.0f;
-        updatedLight.linearAttenuation = 0.09f;
-        updatedLight.quadraticAttenuation = 0.032f;
-        lightingSystem->UpdateLight(light.lightID, updatedLight);
+        // Push FDA packet to MegaLightRenderer (lock-free, ~50ns)
+        lightingSystem->UpdateLight(light.lightID, [&]() -> SecretEngine::LightData {
+            SecretEngine::LightData d;
+            d.type = SecretEngine::LightData::Point;
+            d.position[0] = light.position[0]; d.position[1] = light.position[1]; d.position[2] = light.position[2];
+            d.color[0] = pr; d.color[1] = pg; d.color[2] = pb;
+            d.intensity = 2.0f; d.range = light.radius;
+            d.constantAttenuation = 1.0f; d.linearAttenuation = 0.09f; d.quadraticAttenuation = 0.032f;
+            return d;
+        }());
+    });
 
-        // Update particle visual to match light position and pulsing colour
-        if (renderer && light.particleInstanceID != UINT32_MAX) {
-            renderer->UpdateInstancePosColor(
-                light.particleInstanceID,
+    // Update particle visuals on main thread (renderer calls are not thread-safe)
+    auto* rendererPlugin = m_core->GetCapability("rendering");
+    SecretEngine::IRenderer* renderer = rendererPlugin
+        ? static_cast<SecretEngine::IRenderer*>(rendererPlugin->GetInterface(1)) : nullptr;
+    if (renderer) {
+        for (auto& light : m_movingLights) {
+            if (light.particleInstanceID == UINT32_MAX) continue;
+            float pulse = 0.7f + 0.3f * sinf(light.rotPhase);
+            renderer->UpdateInstancePosColor(light.particleInstanceID,
                 light.position[0], light.position[1], light.position[2],
-                pr, pg, pb,
-                PARTICLE_SCALE
-            );
+                light.color[0]*pulse, light.color[1]*pulse, light.color[2]*pulse,
+                PARTICLE_SCALE);
         }
     }
 }

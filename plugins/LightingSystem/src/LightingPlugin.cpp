@@ -4,97 +4,66 @@
 #include <SecretEngine/ILogger.h>
 
 LightingPlugin::~LightingPlugin() {
-    if (m_lightManager) {
-        delete m_lightManager;
-        m_lightManager = nullptr;
-    }
+    if (m_lightManager) { delete m_lightManager; m_lightManager = nullptr; }
 }
 
 void LightingPlugin::OnLoad(SecretEngine::ICore* core) {
     m_core = core;
     m_lightManager = new SecretEngine::LightManager();
-    
-    // Register as lighting system capability
     m_core->RegisterCapability("lighting", this);
-    
-    // Store 'this' pointer for verification
-    m_selfPointer = this;
-    
-    if (m_core->GetLogger()) {
+    if (m_core->GetLogger())
         m_core->GetLogger()->LogInfo("LightingSystem", "Plugin loaded");
-        
-        // Forward+ inspired: Log configuration
-        const auto& config = m_lightManager->GetTiledLightingConfig();
-        char buffer[256];
-        snprintf(buffer, sizeof(buffer), 
-                "Forward+ Configuration: TileSize=%u, MaxLightsPerTile=%u, MaxTotalLights=1024",
-                config.tileSize, config.maxLightsPerTile);
-        m_core->GetLogger()->LogInfo("LightingSystem", buffer);
-    }
 }
 
 void LightingPlugin::OnActivate() {
-    if (m_core && m_core->GetLogger()) {
+    if (m_core && m_core->GetLogger())
         m_core->GetLogger()->LogInfo("LightingSystem", "Plugin activated");
-    }
 }
 
-void LightingPlugin::OnDeactivate() {
-    if (m_core && m_core->GetLogger()) {
-        m_core->GetLogger()->LogInfo("LightingSystem", "Plugin deactivated");
-    }
-}
+void LightingPlugin::OnDeactivate() {}
 
 void LightingPlugin::OnUnload() {
-    // Only log once - if we're seeing this multiple times, something is wrong
-    static bool unloaded = false;
-    if (!unloaded) {
-        unloaded = true;
-        if (m_core && m_core->GetLogger()) {
-            m_core->GetLogger()->LogInfo("LightingSystem", "Plugin unloaded - THIS SHOULD ONLY APPEAR ONCE!");
-        }
-    }
-    // Clear the light manager to prevent dangling pointers
-    if (m_lightManager) {
-        delete m_lightManager;
-        m_lightManager = nullptr;
-    }
+    if (m_lightManager) { delete m_lightManager; m_lightManager = nullptr; }
 }
 
-void LightingPlugin::OnUpdate(float deltaTime) {
-    // Forward+ inspired: Log culling statistics periodically
-    static float statsTimer = 0.0f;
-    statsTimer += deltaTime;
-    
-    if (statsTimer >= 5.0f && m_lightManager && m_core && m_core->GetLogger()) {
-        statsTimer = 0.0f;
-        
-        if (m_lightManager->IsTiledRenderingEnabled()) {
-            const auto& stats = m_lightManager->GetCullingStats();
-            char buffer[512];
-            snprintf(buffer, sizeof(buffer),
-                    "Forward+ Stats: Lights=%u, Tiles=%u, AvgLightsPerTile=%u, MaxLightsInTile=%u, CullingTime=%.2fms",
-                    stats.totalLights, stats.totalTiles, stats.averageLightsPerTile, 
-                    stats.maxLightsInTile, stats.cullingTimeMs);
-            m_core->GetLogger()->LogInfo("LightingSystem", buffer);
-        }
-    }
-}
+void LightingPlugin::OnUpdate(float /*dt*/) {}
 
 uint32_t LightingPlugin::AddLight(const SecretEngine::LightData& light) {
-    return m_lightManager ? m_lightManager->AddLight(light) : 0;
+    uint32_t id = m_nextID++;
+    if (m_lightManager) m_lightManager->AddLight(light);
+    AllocSlot(id);
+    return id;
 }
 
 void LightingPlugin::UpdateLight(uint32_t lightID, const SecretEngine::LightData& light) {
-    if (m_lightManager) {
-        m_lightManager->UpdateLight(lightID, light);
+    if (m_lightManager) m_lightManager->UpdateLight(lightID, light);
+    // Push FDA packet if stream is connected (set by RendererPlugin)
+    if (m_fdaStream) {
+        uint32_t slot = GetSlotForLight(lightID);
+        if (slot == UINT32_MAX) return;
+        // Packet 1: posX, posY
+        { SecretEngine::Fast::UltraPacket p;
+          p.Set(SecretEngine::Fast::PacketType::LightPos, slot,
+                (int16_t)(light.position[0]*10.f), (int16_t)(light.position[1]*10.f));
+          m_fdaStream->Push(p); }
+        // Packet 2: posZ, colRG
+        { SecretEngine::Fast::UltraPacket p;
+          uint8_t pr=(uint8_t)(light.color[0]*255.f), pg=(uint8_t)(light.color[1]*255.f);
+          p.Set(SecretEngine::Fast::PacketType::LightPosZColor, slot,
+                (int16_t)(light.position[2]*10.f), (int16_t)(pr|(pg<<8)));
+          m_fdaStream->Push(p); }
+        // Packet 3: colB + intensity
+        { SecretEngine::Fast::UltraPacket p;
+          uint8_t pb=(uint8_t)(light.color[2]*255.f), pi=(uint8_t)(light.intensity*63.75f);
+          p.Set(SecretEngine::Fast::PacketType::LightPosZColor, slot|(1u<<23),
+                (int16_t)(pb|(pi<<8)), 0);
+          m_fdaStream->Push(p); }
     }
 }
 
 void LightingPlugin::RemoveLight(uint32_t lightID) {
-    if (m_lightManager) {
-        m_lightManager->RemoveLight(lightID);
-    }
+    if (m_lightManager) m_lightManager->RemoveLight(lightID);
+    m_idToSlot.erase(lightID);
 }
 
 const SecretEngine::LightData* LightingPlugin::GetLight(uint32_t lightID) const {
@@ -106,31 +75,8 @@ uint32_t LightingPlugin::GetLightCount() const {
 }
 
 std::span<const SecretEngine::LightData> LightingPlugin::GetLightBuffer() const {
-    // Debug: Log internal state (only once)
-    static bool logged = false;
-    if (!logged && m_core && m_core->GetLogger()) {
-        logged = true;
-        char buf[256];
-        snprintf(buf, sizeof(buf), "GetLightBuffer: this=%p, m_selfPointer=%p, m_lightManager=%p", 
-                 (void*)this, m_selfPointer, (void*)m_lightManager);
-        m_core->GetLogger()->LogInfo("LightingSystem", buf);
-    }
-    
-    // Safety check: validate m_lightManager pointer
-    if (!m_lightManager) {
-        return std::span<const SecretEngine::LightData>{};
-    }
-    
-    // Get the buffer from the manager
-    auto buffer = m_lightManager->GetLightBuffer();
-    
-    // Sanity check: if the size is absurdly large, return empty span
-    // Max lights is 1024, so any count above that is clearly corruption
-    if (buffer.size() > 1024) {
-        return std::span<const SecretEngine::LightData>{};
-    }
-    
-    return buffer;
+    return m_lightManager ? m_lightManager->GetLightBuffer()
+                          : std::span<const SecretEngine::LightData>{};
 }
 
 const void* LightingPlugin::GetLightBufferRaw() const {
@@ -141,40 +87,22 @@ size_t LightingPlugin::GetLightBufferSize() const {
     return m_lightManager ? m_lightManager->GetLightBufferSize() : 0;
 }
 
-// Forward+ inspired: Tiled lighting configuration
-void LightingPlugin::SetTiledLightingConfig(const SecretEngine::TiledLightingConfig& config) {
-    if (m_lightManager) {
-        m_lightManager->SetTiledLightingConfig(config);
-        
-        if (m_core && m_core->GetLogger()) {
-            char buffer[256];
-            snprintf(buffer, sizeof(buffer),
-                    "Tiled lighting config updated: TileSize=%u, MaxLightsPerTile=%u",
-                    config.tileSize, config.maxLightsPerTile);
-            m_core->GetLogger()->LogInfo("LightingSystem", buffer);
-        }
-    }
+void LightingPlugin::SetTiledLightingConfig(const SecretEngine::TiledLightingConfig& c) {
+    if (m_lightManager) m_lightManager->SetTiledLightingConfig(c);
 }
 
 const SecretEngine::TiledLightingConfig& LightingPlugin::GetTiledLightingConfig() const {
-    static SecretEngine::TiledLightingConfig defaultConfig;
-    return m_lightManager ? m_lightManager->GetTiledLightingConfig() : defaultConfig;
+    static SecretEngine::TiledLightingConfig def;
+    return m_lightManager ? m_lightManager->GetTiledLightingConfig() : def;
 }
 
 const SecretEngine::LightCullingStats& LightingPlugin::GetCullingStats() const {
-    static SecretEngine::LightCullingStats defaultStats;
-    return m_lightManager ? m_lightManager->GetCullingStats() : defaultStats;
+    static SecretEngine::LightCullingStats def;
+    return m_lightManager ? m_lightManager->GetCullingStats() : def;
 }
 
-void LightingPlugin::SetTiledRenderingEnabled(bool enabled) {
-    if (m_lightManager) {
-        m_lightManager->SetTiledRenderingEnabled(enabled);
-        
-        if (m_core && m_core->GetLogger()) {
-            m_core->GetLogger()->LogInfo("LightingSystem", 
-                enabled ? "Forward+ tiled rendering ENABLED" : "Forward+ tiled rendering DISABLED");
-        }
-    }
+void LightingPlugin::SetTiledRenderingEnabled(bool e) {
+    if (m_lightManager) m_lightManager->SetTiledRenderingEnabled(e);
 }
 
 bool LightingPlugin::IsTiledRenderingEnabled() const {
@@ -182,16 +110,7 @@ bool LightingPlugin::IsTiledRenderingEnabled() const {
 }
 
 extern "C" {
-    SecretEngine::IPlugin* CreatePlugin() {
-        return new LightingPlugin();
-    }
-    
-    SecretEngine::IPlugin* CreateLightingPlugin() {
-        return new LightingPlugin();
-    }
-    
-    void DestroyPlugin(SecretEngine::IPlugin* plugin) {
-        delete plugin;
-    }
+    SecretEngine::IPlugin* CreatePlugin()         { return new LightingPlugin(); }
+    SecretEngine::IPlugin* CreateLightingPlugin() { return new LightingPlugin(); }
+    void DestroyPlugin(SecretEngine::IPlugin* p)  { delete p; }
 }
-

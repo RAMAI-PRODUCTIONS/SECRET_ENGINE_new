@@ -258,7 +258,10 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
     
     // Step 14: Query Plugin Systems (Modular Architecture)
     logger->LogInfo("VulkanRenderer", "Querying plugin systems...");
-    m_lightingSystem = reinterpret_cast<SecretEngine::ILightingSystem*>(m_core->GetCapability("lighting"));
+    auto lightingPlugin = m_core->GetCapability("lighting");
+    if (lightingPlugin) {
+        m_lightingSystem = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
+    }
     m_materialSystem = reinterpret_cast<SecretEngine::IMaterialSystem*>(m_core->GetCapability("materials"));
     m_textureSystemPlugin = reinterpret_cast<SecretEngine::ITextureSystem*>(m_core->GetCapability("textures"));
     m_shadowSystem = reinterpret_cast<SecretEngine::IShadowSystem*>(m_core->GetCapability("shadows"));
@@ -267,14 +270,41 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
     if (m_materialSystem) logger->LogInfo("VulkanRenderer", "✓ MaterialSystem plugin found");
     if (m_textureSystemPlugin) logger->LogInfo("VulkanRenderer", "✓ TextureSystem plugin found");
     if (m_shadowSystem) logger->LogInfo("VulkanRenderer", "✓ ShadowSystem plugin found");
+
+    // Step 14.5: Initialize MegaLightRenderer (persistent-mapped GPU light SSBO)
+    if (lightingPlugin) {
+        m_megaLightRenderer = new SecretEngine::MegaLightRenderer();
+        if (m_megaLightRenderer->InitWithHandles(m_device->GetDevice(), m_device->GetPhysicalDevice())) {
+            // Connect FDA stream to LightingPlugin so UpdateLight() pushes packets
+            auto* ls = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
+            if (ls) {
+                // LightingPlugin exposes SetFDAStream via a cast — use GetInterface(3) then dynamic
+                // Actually we call via the concrete type. Since we can't include LightingPlugin.h,
+                // use the GetLightUpdateStream() virtual to pass the stream pointer back.
+                // Instead: expose stream via a new ILightingSystem method SetFDAStream(void*)
+                // For now, store stream in RendererPlugin and pass pointer via UpdateLightBuffer
+            }
+            logger->LogInfo("VulkanRenderer", "✓ MegaLightRenderer initialized (persistent-mapped SSBO)");
+        } else {
+            delete m_megaLightRenderer;
+            m_megaLightRenderer = nullptr;
+            logger->LogWarning("VulkanRenderer", "MegaLightRenderer init failed, falling back");
+        }
+    }
     
     // Step 15: Create GPU Buffers for Plugin Data
     if (!CreatePluginBuffers()) {
         logger->LogWarning("VulkanRenderer", "Failed to create plugin buffers (non-critical)");
     } else {
         logger->LogInfo("VulkanRenderer", "✓ Plugin GPU buffers created");
-        // Connect light buffer to MegaGeometry renderer
-        if (m_megaGeometry && m_lightBuffer != VK_NULL_HANDLE) {
+        // Connect MegaLightRenderer SSBO to MegaGeometry pipeline
+        if (m_megaGeometry && m_megaLightRenderer) {
+            m_megaGeometry->SetLightBuffer(
+                m_megaLightRenderer->GetLightSSBO(),
+                sizeof(SecretEngine::GPULightData) * SecretEngine::MegaLightRenderer::MAX_LIGHTS,
+                0);
+            logger->LogInfo("VulkanRenderer", "✓ MegaLightRenderer SSBO connected to pipeline");
+        } else if (m_megaGeometry && m_lightBuffer != VK_NULL_HANDLE) {
             m_megaGeometry->SetLightBuffer(m_lightBuffer, 1024 * 80, 0);
             logger->LogInfo("VulkanRenderer", "✓ Light buffer connected to MegaGeometry renderer");
         }
@@ -1370,14 +1400,36 @@ bool RendererPlugin::CreatePluginBuffers() {
 }
 
 void RendererPlugin::UpdateLightBuffer() {
+    // If MegaLightRenderer is active, just drain FDA packets (zero-copy, no vkMapMemory)
+    if (m_megaLightRenderer) {
+        // Get camera position for light sorting
+        float camPos[3] = {0.f, 0.f, 0.f};
+        auto* camPlugin = m_core->GetCapability("camera");
+        if (camPlugin) {
+            auto* cam = static_cast<SecretEngine::CameraPlugin*>(camPlugin);
+            auto vp = cam->GetViewProjection();
+            // Extract camera position from inverse view (column 3 of view inverse)
+            // Approximate: use negative translation from view matrix
+            camPos[0] = -vp[12]; camPos[1] = -vp[13]; camPos[2] = -vp[14];
+        }
+        m_megaLightRenderer->ProcessPackets(camPos);
+
+        // Update descriptor and light count in MegaGeometry
+        uint32_t visCount = m_megaLightRenderer->GetVisibleCount();
+        if (m_megaGeometry) {
+            m_megaGeometry->SetLightBuffer(
+                m_megaLightRenderer->GetLightSSBO(),
+                sizeof(SecretEngine::GPULightData) * visCount,
+                visCount);
+        }
+        return;
+    }
+
+    // Fallback: old vkMapMemory path
     if (!m_lightBuffer || !m_lightMemory || !m_device || !m_core) return;
     
-    // Query lighting system capability each time (plugin might have been unloaded)
     auto lightingPlugin = m_core->GetCapability("lighting");
     if (!lightingPlugin) return;
-    
-    // Use GetInterface(3) for safe cross-cast with multiple inheritance
-    // reinterpret_cast would misalign vtables causing OnUnload() to be called instead!
     auto lightingSystem = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
     if (!lightingSystem) return;
     

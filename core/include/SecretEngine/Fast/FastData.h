@@ -30,6 +30,8 @@ enum class PacketType : uint8_t {
     AssetSignal = 5,
     PhysicsDelta = 6,
     CameraView = 7,
+    LightPos = 8,       // lightIdx(metadata) | posX(dataA) | posY(dataB)  — packed 1/32767
+    LightPosZColor = 9, // lightIdx(metadata) | posZ_packed(dataA) | colRGB_packed(dataB)
     Cutsom = 255
 };
 

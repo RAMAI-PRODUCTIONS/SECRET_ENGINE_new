@@ -9,6 +9,7 @@
 #include <SecretEngine/IWorld.h>
 #include <SecretEngine/IInputSystem.h>
 #include <SecretEngine/IAssetProvider.h>
+#include <SecretEngine/JobSystem.h>
 #include "SystemAllocator.h"
 #include "Logger.h"
 #include "PluginManager.h"
@@ -51,6 +52,10 @@ namespace SecretEngine {
             m_world = CreateWorld();
             m_lastTime = std::chrono::high_resolution_clock::now();
             m_logger->LogInfo("Core", "SecretEngine Initializing...");
+            
+            // Initialize JobSystem for multithreaded light/physics updates
+            JobSystem::Instance().Initialize();
+            m_logger->LogInfo("Core", "✓ JobSystem initialized");
             
 #if defined(SE_PLATFORM_ANDROID)
             IPlugin* renderer = CreateVulkanRendererPlugin();

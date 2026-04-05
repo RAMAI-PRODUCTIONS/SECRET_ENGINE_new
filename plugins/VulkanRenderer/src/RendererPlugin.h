@@ -10,6 +10,7 @@
 #include "Window.h"
 #include "Swapchain.h"
 #include "MegaGeometryRenderer.h"
+#include "MegaLightRenderer.h"
 #include "TextureManager.h"
 #include "MeshRenderingSystem.h"
 
@@ -116,6 +117,7 @@ private:
     SecretEngine::IMaterialSystem* m_materialSystem = nullptr;
     SecretEngine::ITextureSystem* m_textureSystemPlugin = nullptr;
     SecretEngine::IShadowSystem* m_shadowSystem = nullptr;
+    SecretEngine::MegaLightRenderer* m_megaLightRenderer = nullptr;
     
     // GPU Buffers for Plugin Data
     VkBuffer m_lightBuffer = VK_NULL_HANDLE;

@@ -10,6 +10,7 @@
 #include "SecretEngine/ILogger.h"
 #include "SecretEngine/ILightingSystem.h"
 #include "SecretEngine/IRenderer.h"
+#include "SecretEngine/JobSystem.h"
 #include "SecretEngine/Components.h"
 #include "FPSComponents.h"
 #include "FPSFastData.h"

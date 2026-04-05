@@ -69,6 +69,10 @@ public:
     // Forward+ inspired: Enable/disable tiled forward rendering
     virtual void SetTiledRenderingEnabled(bool enabled) = 0;
     virtual bool IsTiledRenderingEnabled() const = 0;
+
+    // FDA stream for zero-copy light updates (id=4 via GetInterface)
+    // Returns Fast::UltraRingBuffer<2048>* cast to void*
+    virtual void* GetLightUpdateStream() { return nullptr; }
 };
 
 } // namespace SecretEngine
