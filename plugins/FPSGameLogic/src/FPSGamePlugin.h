@@ -9,6 +9,7 @@
 #include "SecretEngine/IWorld.h"
 #include "SecretEngine/ILogger.h"
 #include "SecretEngine/ILightingSystem.h"
+#include "SecretEngine/IRenderer.h"
 #include "SecretEngine/Components.h"
 #include "FPSComponents.h"
 #include "FPSFastData.h"
@@ -77,13 +78,19 @@ private:
     // Forward+ inspired: Dynamic moving lights
     struct MovingLight {
         uint32_t lightID;
+        uint32_t particleInstanceID;  // visual particle in the renderer
         float position[3];
         float velocity[3];
         float color[3];
         float radius;
         float speed;
+        float rotPhase;  // for spinning animation
     };
     std::vector<MovingLight> m_movingLights;
+    
+    // Particle mesh path (small cube used as light orb)
+    static constexpr const char* PARTICLE_MESH = "meshes/wall.meshbin";
+    static constexpr float PARTICLE_SCALE = 8.0f;  // small orb
     
     void RegisterComponents();
     void CreatePlayerEntity();
@@ -92,6 +99,9 @@ private:
     // Forward+ inspired: Dynamic lighting
     void CreateRandomMovingLights(int count);
     void UpdateMovingLights(float deltaTime);
+    void SpawnLightParticles(SecretEngine::IRenderer* renderer);
+
+    bool m_particlesSpawned = false;
 };
 
 } // namespace SecretEngine::FPS

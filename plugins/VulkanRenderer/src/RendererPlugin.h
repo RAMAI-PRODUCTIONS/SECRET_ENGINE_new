@@ -42,8 +42,15 @@ public:
     void SetCubeColor(int colorIndex) override;
     void SetDebugInfo(int slot, const char* text) override;
     void GetStats(uint32_t& instances, uint32_t& triangles, uint32_t& drawCalls) override;
-    uint64_t GetVRAMUsage() override; // Returns VRAM usage in bytes
-    void ClearAllInstances() override; // Clear all instances when changing levels
+    uint64_t GetVRAMUsage() override;
+    void ClearAllInstances() override;
+
+    // Particle / instance API
+    uint32_t SpawnInstance(const char* meshPath, float x, float y, float z,
+                           float r, float g, float b, float scale = 1.0f) override;
+    void UpdateInstancePosColor(uint32_t id, float x, float y, float z,
+                                float r, float g, float b, float scale = 1.0f) override;
+    void DespawnInstance(uint32_t id, const char* meshPath) override;
     void DrawWelcomeText(VkCommandBuffer cmd);
 
 private:

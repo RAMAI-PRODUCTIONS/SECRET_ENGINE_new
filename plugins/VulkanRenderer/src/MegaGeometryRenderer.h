@@ -126,6 +126,7 @@ public:
     }
     
     void UpdateInstanceTransform(uint32_t instanceID, float x, float y, float z, float rotY = 0.0f, float rotX = 0.0f, float rotZ = 0.0f);
+    void UpdateInstanceTransformScaled(uint32_t instanceID, float x, float y, float z, float scale, float rotY = 0.0f);
     void UpdateInstanceColor(uint32_t instanceID, float r, float g, float b, float a);
     void UpdateInstanceTexture(uint32_t instanceID, uint32_t textureID);
     

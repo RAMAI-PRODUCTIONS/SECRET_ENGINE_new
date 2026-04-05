@@ -819,6 +819,31 @@ void RendererPlugin::ClearAllInstances() {
     }
 }
 
+uint32_t RendererPlugin::SpawnInstance(const char* meshPath, float x, float y, float z,
+                                        float r, float g, float b, float scale) {
+    if (!m_megaGeometry) return UINT32_MAX;
+    uint32_t slot = m_megaGeometry->GetOrLoadMeshSlot(meshPath);
+    uint32_t id = m_megaGeometry->AddInstance(slot, x, y, z, UINT32_MAX);
+    if (id != UINT32_MAX) {
+        m_megaGeometry->UpdateInstanceColor(id, r, g, b, 1.0f);
+        m_megaGeometry->UpdateInstanceTransformScaled(id, x, y, z, scale);
+    }
+    return id;
+}
+
+void RendererPlugin::UpdateInstancePosColor(uint32_t id, float x, float y, float z,
+                                             float r, float g, float b, float scale) {
+    if (!m_megaGeometry || id == UINT32_MAX) return;
+    m_megaGeometry->UpdateInstanceTransformScaled(id, x, y, z, scale);
+    m_megaGeometry->UpdateInstanceColor(id, r, g, b, 1.0f);
+}
+
+void RendererPlugin::DespawnInstance(uint32_t id, const char* meshPath) {
+    if (!m_megaGeometry || id == UINT32_MAX) return;
+    uint32_t slot = m_megaGeometry->GetOrLoadMeshSlot(meshPath);
+    m_megaGeometry->RemoveInstance(id, slot);
+}
+
 bool RendererPlugin::CreateRenderPass() {
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = m_swapchain->GetFormat();

@@ -48,6 +48,18 @@ void FPSGamePlugin::OnUpdate(float dt) {
     m_gameTime += dt;
     m_matchState.matchTime += dt;
     
+    // Deferred particle spawn: renderer wasn't ready during OnActivate
+    if (!m_particlesSpawned) {
+        auto* rendererPlugin = m_core->GetCapability("rendering");
+        if (rendererPlugin) {
+            auto* renderer = static_cast<SecretEngine::IRenderer*>(rendererPlugin->GetInterface(1));
+            if (renderer) {
+                SpawnLightParticles(renderer);
+                m_particlesSpawned = true;
+            }
+        }
+    }
+    
     // Get physics plugin
     auto* physics = static_cast<SecretEngine::Physics::PhysicsPlugin*>(
         m_core->GetCapability("physics")
@@ -175,6 +187,8 @@ void FPSGamePlugin::CreateRandomMovingLights(int count) {
         m_logger->LogError("FPSGameLogic", "LightingSystem GetInterface(3) failed!");
         return;
     }
+
+    // Get renderer for particle instances (unused here - deferred to SpawnLightParticles)
     
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -183,12 +197,12 @@ void FPSGamePlugin::CreateRandomMovingLights(int count) {
     std::uniform_real_distribution<float> colorDist(0.3f, 1.0f);
     std::uniform_real_distribution<float> speedDist(1.0f, 3.0f);
     std::uniform_real_distribution<float> radiusDist(3.0f, 8.0f);
+    std::uniform_real_distribution<float> phaseDist(0.0f, 6.28318f);
     
     for (int i = 0; i < count; ++i) {
         SecretEngine::LightData light;
         light.type = SecretEngine::LightData::Point;
         
-        // Random position
         float x = posDist(gen);
         float y = heightDist(gen);
         float z = posDist(gen);
@@ -197,24 +211,25 @@ void FPSGamePlugin::CreateRandomMovingLights(int count) {
         light.position[1] = y;
         light.position[2] = z;
         
-        // Random color (vibrant colors)
         light.color[0] = colorDist(gen);
         light.color[1] = colorDist(gen);
         light.color[2] = colorDist(gen);
         
-        // Forward+ inspired: Physically-based attenuation parameters
         light.intensity = 2.0f;
         light.range = radiusDist(gen);
         light.constantAttenuation = 1.0f;
         light.linearAttenuation = 0.09f;
         light.quadraticAttenuation = 0.032f;
         
-        // Add light to system
         uint32_t lightID = lightingSystem->AddLight(light);
         
-        // Store moving light data
+        // Spawn a small glowing particle at the light position
+        uint32_t particleID = UINT32_MAX;
+        // Note: particles are spawned deferred in SpawnLightParticles() once renderer is ready
+        
         MovingLight movingLight;
         movingLight.lightID = lightID;
+        movingLight.particleInstanceID = particleID;
         movingLight.position[0] = x;
         movingLight.position[1] = y;
         movingLight.position[2] = z;
@@ -223,19 +238,36 @@ void FPSGamePlugin::CreateRandomMovingLights(int count) {
         movingLight.color[2] = light.color[2];
         movingLight.radius = light.range;
         movingLight.speed = speedDist(gen);
+        movingLight.rotPhase = phaseDist(gen);
         
-        // Random velocity
         std::uniform_real_distribution<float> velDist(-1.0f, 1.0f);
         movingLight.velocity[0] = velDist(gen);
-        movingLight.velocity[1] = velDist(gen) * 0.5f; // Less vertical movement
+        movingLight.velocity[1] = velDist(gen) * 0.5f;
         movingLight.velocity[2] = velDist(gen);
         
         m_movingLights.push_back(movingLight);
     }
     
     char buffer[128];
-    snprintf(buffer, sizeof(buffer), "created %d randomly moving lights with Forward+ attenuation", count);
+    snprintf(buffer, sizeof(buffer), "created %d light particles (mesh orbs)", count);
     m_logger->LogInfo("FPSGameLogic", buffer);
+}
+
+// Deferred particle spawn - called once renderer is ready
+void FPSGamePlugin::SpawnLightParticles(SecretEngine::IRenderer* renderer) {
+    for (auto& light : m_movingLights) {
+        if (light.particleInstanceID == UINT32_MAX) {
+            light.particleInstanceID = renderer->SpawnInstance(
+                PARTICLE_MESH,
+                light.position[0], light.position[1], light.position[2],
+                light.color[0], light.color[1], light.color[2],
+                PARTICLE_SCALE
+            );
+        }
+    }
+    char buf[64];
+    snprintf(buf, sizeof(buf), "spawned %zu light particle instances", m_movingLights.size());
+    m_logger->LogInfo("FPSGameLogic", buf);
 }
 
 // Forward+ inspired: Update moving lights each frame
@@ -244,9 +276,17 @@ void FPSGamePlugin::UpdateMovingLights(float deltaTime) {
     if (!lightingPlugin) return;
     auto* lightingSystem = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
     if (!lightingSystem) return;
+
+    // Get renderer for particle updates
+    auto* rendererPlugin = m_core->GetCapability("rendering");
+    SecretEngine::IRenderer* renderer = rendererPlugin
+        ? static_cast<SecretEngine::IRenderer*>(rendererPlugin->GetInterface(1))
+        : nullptr;
+
+    m_gameTime += 0.0f; // already tracked in OnUpdate
     
     for (auto& light : m_movingLights) {
-        // Update position
+        // Move
         light.position[0] += light.velocity[0] * light.speed * deltaTime;
         light.position[1] += light.velocity[1] * light.speed * deltaTime;
         light.position[2] += light.velocity[2] * light.speed * deltaTime;
@@ -265,23 +305,39 @@ void FPSGamePlugin::UpdateMovingLights(float deltaTime) {
             light.velocity[2] *= -1.0f;
             light.position[2] = std::clamp(light.position[2], -boundary, boundary);
         }
-        
+
+        // Pulse colour over time
+        light.rotPhase += deltaTime * 1.5f;
+        float pulse = 0.7f + 0.3f * sinf(light.rotPhase);
+        float pr = light.color[0] * pulse;
+        float pg = light.color[1] * pulse;
+        float pb = light.color[2] * pulse;
+
         // Update light in system
         SecretEngine::LightData updatedLight;
         updatedLight.type = SecretEngine::LightData::Point;
         updatedLight.position[0] = light.position[0];
         updatedLight.position[1] = light.position[1];
         updatedLight.position[2] = light.position[2];
-        updatedLight.color[0] = light.color[0];
-        updatedLight.color[1] = light.color[1];
-        updatedLight.color[2] = light.color[2];
+        updatedLight.color[0] = pr;
+        updatedLight.color[1] = pg;
+        updatedLight.color[2] = pb;
         updatedLight.intensity = 2.0f;
         updatedLight.range = light.radius;
         updatedLight.constantAttenuation = 1.0f;
         updatedLight.linearAttenuation = 0.09f;
         updatedLight.quadraticAttenuation = 0.032f;
-        
         lightingSystem->UpdateLight(light.lightID, updatedLight);
+
+        // Update particle visual to match light position and pulsing colour
+        if (renderer && light.particleInstanceID != UINT32_MAX) {
+            renderer->UpdateInstancePosColor(
+                light.particleInstanceID,
+                light.position[0], light.position[1], light.position[2],
+                pr, pg, pb,
+                PARTICLE_SCALE
+            );
+        }
     }
 }
 

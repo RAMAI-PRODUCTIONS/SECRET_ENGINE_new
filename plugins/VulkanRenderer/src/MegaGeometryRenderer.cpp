@@ -22,6 +22,19 @@ using SecretEngine::Vulkan::Helpers;
 
 static constexpr uint32_t NO_TEXTURE_ID = 0xFFFFFFFFu;
 
+void MegaGeometryRenderer::UpdateInstanceTransformScaled(uint32_t instanceID, float x, float y, float z, float scale, float rotY) {
+    if (instanceID >= MAX_INSTANCES) return;
+    float cy = cosf(rotY), sy = sinf(rotY);
+    for (int i = 0; i < 2; ++i) {
+        if (m_instanceDataMapped[i]) {
+            auto& t = m_instanceDataMapped[i][instanceID].transform;
+            t.m[0] = cy * scale; t.m[1] = -sy * scale; t.m[2] = 0.0f; t.m[3] = x;
+            t.m[4] = sy * scale; t.m[5] =  cy * scale; t.m[6] = 0.0f; t.m[7] = y;
+            t.m[8] = 0.0f;       t.m[9] =  0.0f;       t.m[10] = scale; t.m[11] = z;
+        }
+    }
+}
+
 void MegaGeometryRenderer::UpdateInstanceTransform(uint32_t instanceID, float x, float y, float z, float rotY, float rotX, float rotZ) {
     if (instanceID >= MAX_INSTANCES) return;
 
