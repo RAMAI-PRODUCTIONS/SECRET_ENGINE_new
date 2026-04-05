@@ -21,7 +21,7 @@ public:
     void OnUnload() override;
     void OnUpdate(float deltaTime) override;
     
-    // ILightingSystem interface
+    // ILightingSystem interface - Basic light management
     uint32_t AddLight(const SecretEngine::LightData& light) override;
     void UpdateLight(uint32_t lightID, const SecretEngine::LightData& light) override;
     void RemoveLight(uint32_t lightID) override;
@@ -30,6 +30,17 @@ public:
     std::span<const SecretEngine::LightData> GetLightBuffer() const override;
     const void* GetLightBufferRaw() const override;
     size_t GetLightBufferSize() const override;
+    
+    // Forward+ inspired: Tiled lighting configuration
+    void SetTiledLightingConfig(const SecretEngine::TiledLightingConfig& config) override;
+    const SecretEngine::TiledLightingConfig& GetTiledLightingConfig() const override;
+    
+    // Forward+ inspired: Culling statistics
+    const SecretEngine::LightCullingStats& GetCullingStats() const override;
+    
+    // Forward+ inspired: Tiled rendering control
+    void SetTiledRenderingEnabled(bool enabled) override;
+    bool IsTiledRenderingEnabled() const override;
     
 private:
     SecretEngine::ICore* m_core = nullptr;

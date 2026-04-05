@@ -8,6 +8,7 @@
 #include "SecretEngine/ICore.h"
 #include "SecretEngine/IWorld.h"
 #include "SecretEngine/ILogger.h"
+#include "SecretEngine/ILightingSystem.h"
 #include "SecretEngine/Components.h"
 #include "FPSComponents.h"
 #include "FPSFastData.h"
@@ -73,9 +74,24 @@ private:
     Entity m_localPlayerEntity = Entity::Invalid;
     float m_gameTime = 0.0f;
     
+    // Forward+ inspired: Dynamic moving lights
+    struct MovingLight {
+        uint32_t lightID;
+        float position[3];
+        float velocity[3];
+        float color[3];
+        float radius;
+        float speed;
+    };
+    std::vector<MovingLight> m_movingLights;
+    
     void RegisterComponents();
     void CreatePlayerEntity();
     void CreateBotEntities(int count);
+    
+    // Forward+ inspired: Dynamic lighting
+    void CreateRandomMovingLights(int count);
+    void UpdateMovingLights(float deltaTime);
 };
 
 } // namespace SecretEngine::FPS

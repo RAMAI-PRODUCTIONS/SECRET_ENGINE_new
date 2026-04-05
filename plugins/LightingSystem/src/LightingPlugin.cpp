@@ -19,6 +19,14 @@ void LightingPlugin::OnLoad(SecretEngine::ICore* core) {
     
     if (m_core->GetLogger()) {
         m_core->GetLogger()->LogInfo("LightingSystem", "Plugin loaded");
+        
+        // Forward+ inspired: Log configuration
+        const auto& config = m_lightManager->GetTiledLightingConfig();
+        char buffer[256];
+        snprintf(buffer, sizeof(buffer), 
+                "Forward+ Configuration: TileSize=%u, MaxLightsPerTile=%u, MaxTotalLights=1024",
+                config.tileSize, config.maxLightsPerTile);
+        m_core->GetLogger()->LogInfo("LightingSystem", buffer);
     }
 }
 
@@ -41,7 +49,23 @@ void LightingPlugin::OnUnload() {
 }
 
 void LightingPlugin::OnUpdate(float deltaTime) {
-    // Update light animations, shadows, etc.
+    // Forward+ inspired: Log culling statistics periodically
+    static float statsTimer = 0.0f;
+    statsTimer += deltaTime;
+    
+    if (statsTimer >= 5.0f && m_lightManager && m_core && m_core->GetLogger()) {
+        statsTimer = 0.0f;
+        
+        if (m_lightManager->IsTiledRenderingEnabled()) {
+            const auto& stats = m_lightManager->GetCullingStats();
+            char buffer[512];
+            snprintf(buffer, sizeof(buffer),
+                    "Forward+ Stats: Lights=%u, Tiles=%u, AvgLightsPerTile=%u, MaxLightsInTile=%u, CullingTime=%.2fms",
+                    stats.totalLights, stats.totalTiles, stats.averageLightsPerTile, 
+                    stats.maxLightsInTile, stats.cullingTimeMs);
+            m_core->GetLogger()->LogInfo("LightingSystem", buffer);
+        }
+    }
 }
 
 uint32_t LightingPlugin::AddLight(const SecretEngine::LightData& light) {
@@ -78,6 +102,46 @@ const void* LightingPlugin::GetLightBufferRaw() const {
 
 size_t LightingPlugin::GetLightBufferSize() const {
     return m_lightManager ? m_lightManager->GetLightBufferSize() : 0;
+}
+
+// Forward+ inspired: Tiled lighting configuration
+void LightingPlugin::SetTiledLightingConfig(const SecretEngine::TiledLightingConfig& config) {
+    if (m_lightManager) {
+        m_lightManager->SetTiledLightingConfig(config);
+        
+        if (m_core && m_core->GetLogger()) {
+            char buffer[256];
+            snprintf(buffer, sizeof(buffer),
+                    "Tiled lighting config updated: TileSize=%u, MaxLightsPerTile=%u",
+                    config.tileSize, config.maxLightsPerTile);
+            m_core->GetLogger()->LogInfo("LightingSystem", buffer);
+        }
+    }
+}
+
+const SecretEngine::TiledLightingConfig& LightingPlugin::GetTiledLightingConfig() const {
+    static SecretEngine::TiledLightingConfig defaultConfig;
+    return m_lightManager ? m_lightManager->GetTiledLightingConfig() : defaultConfig;
+}
+
+const SecretEngine::LightCullingStats& LightingPlugin::GetCullingStats() const {
+    static SecretEngine::LightCullingStats defaultStats;
+    return m_lightManager ? m_lightManager->GetCullingStats() : defaultStats;
+}
+
+void LightingPlugin::SetTiledRenderingEnabled(bool enabled) {
+    if (m_lightManager) {
+        m_lightManager->SetTiledRenderingEnabled(enabled);
+        
+        if (m_core && m_core->GetLogger()) {
+            m_core->GetLogger()->LogInfo("LightingSystem", 
+                enabled ? "Forward+ tiled rendering ENABLED" : "Forward+ tiled rendering DISABLED");
+        }
+    }
+}
+
+bool LightingPlugin::IsTiledRenderingEnabled() const {
+    return m_lightManager ? m_lightManager->IsTiledRenderingEnabled() : false;
 }
 
 extern "C" {

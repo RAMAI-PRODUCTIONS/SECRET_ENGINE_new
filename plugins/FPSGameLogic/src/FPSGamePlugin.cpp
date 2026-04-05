@@ -30,7 +30,10 @@ void FPSGamePlugin::OnActivate() {
     CreatePlayerEntity();
     CreateBotEntities(5);
     
-    m_logger->LogInfo("FPSGameLogic", "initialized: 1 player + 5 bots");
+    // Forward+ inspired: Create randomly moving lights to test the enhanced lighting system
+    CreateRandomMovingLights(20);
+    
+    m_logger->LogInfo("FPSGameLogic", "initialized: 1 player + 5 bots + 20 moving lights");
 }
 
 void FPSGamePlugin::OnDeactivate() {
@@ -57,6 +60,9 @@ void FPSGamePlugin::OnUpdate(float dt) {
     WeaponSystem::Update(m_world, physics, m_gameTime, m_fastStreams.actionInput, m_fastStreams.damageEvents, m_logger);
     CombatSystem::ProcessDamageEvents(m_world, m_fastStreams.damageEvents, m_matchState);
     AISystem::Update(m_world, dt, m_fastStreams.actionInput, m_localPlayerEntity);
+    
+    // Forward+ inspired: Update moving lights
+    UpdateMovingLights(dt);
     
     // Check win condition
     if (m_matchState.playerKills >= m_matchState.killLimit && !m_matchState.matchEnded) {
@@ -153,6 +159,127 @@ void FPSGamePlugin::CreateBotEntities(int count) {
     char buffer[128];
     snprintf(buffer, sizeof(buffer), "created %d bot entities from data table (enemy_soldier)", count);
     m_logger->LogInfo("FPSGameLogic", buffer);
+}
+
+// Forward+ inspired: Create randomly moving lights to showcase the enhanced lighting system
+void FPSGamePlugin::CreateRandomMovingLights(int count) {
+    auto* lightingSystem = reinterpret_cast<SecretEngine::ILightingSystem*>(
+        m_core->GetCapability("lighting")
+    );
+    
+    if (!lightingSystem) {
+        m_logger->LogError("FPSGameLogic", "LightingSystem not found! Cannot create lights.");
+        return;
+    }
+    
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> posDist(-15.0f, 15.0f);
+    std::uniform_real_distribution<float> heightDist(1.0f, 5.0f);
+    std::uniform_real_distribution<float> colorDist(0.3f, 1.0f);
+    std::uniform_real_distribution<float> speedDist(1.0f, 3.0f);
+    std::uniform_real_distribution<float> radiusDist(3.0f, 8.0f);
+    
+    for (int i = 0; i < count; ++i) {
+        SecretEngine::LightData light;
+        light.type = SecretEngine::LightData::Point;
+        
+        // Random position
+        float x = posDist(gen);
+        float y = heightDist(gen);
+        float z = posDist(gen);
+        
+        light.position[0] = x;
+        light.position[1] = y;
+        light.position[2] = z;
+        
+        // Random color (vibrant colors)
+        light.color[0] = colorDist(gen);
+        light.color[1] = colorDist(gen);
+        light.color[2] = colorDist(gen);
+        
+        // Forward+ inspired: Physically-based attenuation parameters
+        light.intensity = 2.0f;
+        light.range = radiusDist(gen);
+        light.constantAttenuation = 1.0f;
+        light.linearAttenuation = 0.09f;
+        light.quadraticAttenuation = 0.032f;
+        
+        // Add light to system
+        uint32_t lightID = lightingSystem->AddLight(light);
+        
+        // Store moving light data
+        MovingLight movingLight;
+        movingLight.lightID = lightID;
+        movingLight.position[0] = x;
+        movingLight.position[1] = y;
+        movingLight.position[2] = z;
+        movingLight.color[0] = light.color[0];
+        movingLight.color[1] = light.color[1];
+        movingLight.color[2] = light.color[2];
+        movingLight.radius = light.range;
+        movingLight.speed = speedDist(gen);
+        
+        // Random velocity
+        std::uniform_real_distribution<float> velDist(-1.0f, 1.0f);
+        movingLight.velocity[0] = velDist(gen);
+        movingLight.velocity[1] = velDist(gen) * 0.5f; // Less vertical movement
+        movingLight.velocity[2] = velDist(gen);
+        
+        m_movingLights.push_back(movingLight);
+    }
+    
+    char buffer[128];
+    snprintf(buffer, sizeof(buffer), "created %d randomly moving lights with Forward+ attenuation", count);
+    m_logger->LogInfo("FPSGameLogic", buffer);
+}
+
+// Forward+ inspired: Update moving lights each frame
+void FPSGamePlugin::UpdateMovingLights(float deltaTime) {
+    auto* lightingSystem = reinterpret_cast<SecretEngine::ILightingSystem*>(
+        m_core->GetCapability("lighting")
+    );
+    
+    if (!lightingSystem) return;
+    
+    for (auto& light : m_movingLights) {
+        // Update position
+        light.position[0] += light.velocity[0] * light.speed * deltaTime;
+        light.position[1] += light.velocity[1] * light.speed * deltaTime;
+        light.position[2] += light.velocity[2] * light.speed * deltaTime;
+        
+        // Bounce off boundaries
+        const float boundary = 15.0f;
+        if (light.position[0] < -boundary || light.position[0] > boundary) {
+            light.velocity[0] *= -1.0f;
+            light.position[0] = std::clamp(light.position[0], -boundary, boundary);
+        }
+        if (light.position[1] < 1.0f || light.position[1] > 8.0f) {
+            light.velocity[1] *= -1.0f;
+            light.position[1] = std::clamp(light.position[1], 1.0f, 8.0f);
+        }
+        if (light.position[2] < -boundary || light.position[2] > boundary) {
+            light.velocity[2] *= -1.0f;
+            light.position[2] = std::clamp(light.position[2], -boundary, boundary);
+        }
+        
+        // Update light in system
+        SecretEngine::LightData updatedLight;
+        updatedLight.type = SecretEngine::LightData::Point;
+        updatedLight.position[0] = light.position[0];
+        updatedLight.position[1] = light.position[1];
+        updatedLight.position[2] = light.position[2];
+        updatedLight.color[0] = light.color[0];
+        updatedLight.color[1] = light.color[1];
+        updatedLight.color[2] = light.color[2];
+        updatedLight.intensity = 2.0f;
+        updatedLight.range = light.radius;
+        updatedLight.constantAttenuation = 1.0f;
+        updatedLight.linearAttenuation = 0.09f;
+        updatedLight.quadraticAttenuation = 0.032f;
+        
+        lightingSystem->UpdateLight(light.lightID, updatedLight);
+    }
 }
 
 } // namespace SecretEngine::FPS
