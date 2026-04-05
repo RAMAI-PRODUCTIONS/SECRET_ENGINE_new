@@ -98,6 +98,7 @@ if(ANDROID)
         LevelSystem        # NEW: Level System
         FPSGameLogic       # NEW: FPS Game Logic
         FPSUIPlugin        # NEW: FPS UI
+        LightingSystem     # Forward+ Lighting System
         glm::glm
         android 
         log

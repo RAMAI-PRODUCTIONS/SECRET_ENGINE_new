@@ -273,6 +273,11 @@ void RendererPlugin::InitializeHardware(void* nativeWindow) {
         logger->LogWarning("VulkanRenderer", "Failed to create plugin buffers (non-critical)");
     } else {
         logger->LogInfo("VulkanRenderer", "✓ Plugin GPU buffers created");
+        // Connect light buffer to MegaGeometry renderer
+        if (m_megaGeometry && m_lightBuffer != VK_NULL_HANDLE) {
+            m_megaGeometry->SetLightBuffer(m_lightBuffer, 1024 * 80, 0);
+            logger->LogInfo("VulkanRenderer", "✓ Light buffer connected to MegaGeometry renderer");
+        }
     }
     
     // All 3D rendering now goes through MegaGeometryRenderer
@@ -1311,8 +1316,9 @@ bool RendererPlugin::RecreateSwapchain() {
 bool RendererPlugin::CreatePluginBuffers() {
     auto logger = m_core ? m_core->GetLogger() : nullptr;
     
-    // Create Light Buffer (256 lights × 64 bytes = 16KB)
-    VkDeviceSize lightBufferSize = 256 * 64;
+    // Create Light Buffer (1024 lights × 80 bytes = 81,920 bytes ~= 80KB)
+    // Allocate extra space to handle any alignment or size issues
+    VkDeviceSize lightBufferSize = 1024 * 80;
     if (!Helpers::CreateBuffer(m_device->GetDevice(), m_device->GetPhysicalDevice(), lightBufferSize,
                              VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -1334,35 +1340,112 @@ bool RendererPlugin::CreatePluginBuffers() {
     // Create descriptor set layouts and sets for lights and materials
     // (Simplified - in production you'd create proper descriptor sets)
     
-    if (logger) logger->LogInfo("VulkanRenderer", "✓ Plugin buffers created (16KB lights + 256KB materials)");
+    if (logger) logger->LogInfo("VulkanRenderer", "✓ Plugin buffers created (80KB lights + 256KB materials)");
     return true;
 }
 
 void RendererPlugin::UpdateLightBuffer() {
-    if (!m_lightingSystem || !m_lightBuffer) return;
+    if (!m_lightBuffer || !m_lightMemory || !m_device || !m_core) return;
+    
+    // Query lighting system capability each time (plugin might have been unloaded)
+    auto lightingPlugin = m_core->GetCapability("lighting");
+    if (!lightingPlugin) return;
+    
+    // Use GetInterface(3) for safe cross-cast with multiple inheritance
+    // reinterpret_cast would misalign vtables causing OnUnload() to be called instead!
+    auto lightingSystem = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
+    if (!lightingSystem) return;
+    
+    // Log the pointer we received (once)
+    static bool loggedPtr = false;
+    if (!loggedPtr && m_core && m_core->GetLogger()) {
+        loggedPtr = true;
+        char msg[128];
+        snprintf(msg, sizeof(msg), "LightingSystem pointer: %p", (void*)lightingSystem);
+        m_core->GetLogger()->LogInfo("VulkanRenderer", msg);
+    }
     
     // C++26: Use std::span for type-safe buffer access
-    auto lightData = m_lightingSystem->GetLightBuffer();
+    auto lightData = lightingSystem->GetLightBuffer();
     
-    if (!lightData.empty()) {
-        void* mapped;
-        vkMapMemory(m_device->GetDevice(), m_lightMemory, 0, lightData.size_bytes(), 0, &mapped);
-        memcpy(mapped, lightData.data(), lightData.size_bytes());
+    if (lightData.empty()) return;  // No lights to update
+    
+    // Get the actual data size
+    size_t dataSize = lightData.size_bytes();
+    size_t lightCount = lightData.size();
+    
+    // Log once for debugging
+    static bool logged = false;
+    if (!logged && m_core && m_core->GetLogger()) {
+        logged = true;
+        char msg[128];
+        snprintf(msg, sizeof(msg), "Light buffer: %zu lights, %zu bytes, sizeof(LightData)=%zu", 
+                 lightCount, dataSize, sizeof(SecretEngine::LightData));
+        m_core->GetLogger()->LogInfo("VulkanRenderer", msg);
+    }
+    
+    // Sanity check: if lightCount is absurd, skip update
+    if (lightCount > 1024 || dataSize > 1024 * 100) {
+        return;  // Corrupted data
+    }
+    
+    // Use the actual buffer size we allocated
+    VkDeviceSize maxBufferSize = 1024 * 80;  // 80KB
+    
+    // Clamp to buffer size if needed
+    if (dataSize > maxBufferSize) {
+        dataSize = maxBufferSize;
+    }
+    
+    void* mapped = nullptr;
+    VkResult result = vkMapMemory(m_device->GetDevice(), m_lightMemory, 0, dataSize, 0, &mapped);
+    
+    if (result == VK_SUCCESS && mapped != nullptr) {
+        memcpy(mapped, lightData.data(), dataSize);
         vkUnmapMemory(m_device->GetDevice(), m_lightMemory);
+    }
+
+    // Update light count in MegaGeometry renderer so shaders know how many lights to process
+    if (m_megaGeometry) {
+        m_megaGeometry->SetLightBuffer(m_lightBuffer, dataSize, static_cast<uint32_t>(lightCount));
     }
 }
 
 void RendererPlugin::UpdateMaterialBuffer() {
-    if (!m_materialSystem || !m_materialBuffer) return;
+    if (!m_materialBuffer || !m_materialMemory || !m_device || !m_core) return;
+    
+    // Query material system capability each time (plugin might have been unloaded)
+    auto materialSystem = reinterpret_cast<SecretEngine::IMaterialSystem*>(m_core->GetCapability("materials"));
+    if (!materialSystem) return;
     
     // C++26: Use std::span for type-safe buffer access
-    auto materialData = m_materialSystem->GetMaterialBuffer();
+    auto materialData = materialSystem->GetMaterialBuffer();
     
     if (!materialData.empty()) {
-        void* mapped;
-        vkMapMemory(m_device->GetDevice(), m_materialMemory, 0, materialData.size_bytes(), 0, &mapped);
-        memcpy(mapped, materialData.data(), materialData.size_bytes());
-        vkUnmapMemory(m_device->GetDevice(), m_materialMemory);
+        // Check buffer size limit (4096 materials × 64 bytes = 256KB)
+        VkDeviceSize maxBufferSize = 4096 * 64;
+        VkDeviceSize dataSize = materialData.size_bytes();
+        
+        if (dataSize > maxBufferSize) {
+            if (m_core && m_core->GetLogger()) {
+                m_core->GetLogger()->LogWarning("VulkanRenderer", 
+                    "Material buffer overflow: data exceeds buffer capacity");
+            }
+            dataSize = maxBufferSize;  // Clamp to buffer size
+        }
+        
+        void* mapped = nullptr;
+        VkResult result = vkMapMemory(m_device->GetDevice(), m_materialMemory, 0, dataSize, 0, &mapped);
+        
+        if (result == VK_SUCCESS && mapped != nullptr) {
+            memcpy(mapped, materialData.data(), dataSize);
+            vkUnmapMemory(m_device->GetDevice(), m_materialMemory);
+        } else {
+            if (m_core && m_core->GetLogger()) {
+                m_core->GetLogger()->LogError("VulkanRenderer", 
+                    "Failed to map material buffer memory");
+            }
+        }
     }
 }
 

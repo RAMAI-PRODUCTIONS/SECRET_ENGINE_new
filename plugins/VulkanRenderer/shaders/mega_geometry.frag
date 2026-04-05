@@ -1,30 +1,26 @@
 #version 450
+#extension GL_EXT_nonuniform_qualifier : enable
 
 // Inputs from vertex shader
 layout(location = 0) in vec2 fragTexCoord;
 layout(location = 1) in vec3 fragNormal;
-layout(location = 2) in vec3 fragVertexLight;  // Vertex GI (R11G11B10F unpacked)
-
-// Texture samplers (2 slots: diffuse + normal map)
-layout(set = 1, binding = 0) uniform sampler2D diffuseTexture;
-layout(set = 1, binding = 1) uniform sampler2D normalTexture;
+layout(location = 2) in vec4 fragColor;
+layout(location = 3) in flat uint fragTextureID;
+layout(location = 4) in vec3 fragWorldPos;
 
 // Output
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    // Sample albedo texture
-    vec4 albedo = texture(diffuseTexture, fragTexCoord);
-    
-    // Apply vertex GI lighting
-    // fragVertexLight contains pre-computed global illumination
-    vec3 finalColor = albedo.rgb * fragVertexLight;
-    
-    // Optional: Add small ambient term to prevent pure black
-    finalColor += albedo.rgb * 0.03;
-    
-    // Optional: Tonemap for HDR (simple Reinhard)
-    // finalColor = finalColor / (finalColor + vec3(1.0));
-    
-    outColor = vec4(finalColor, albedo.a);
+    // Use instance color as albedo (no texture dependency)
+    vec3 albedo = fragColor.rgb;
+
+    vec3 N = normalize(fragNormal);
+
+    // Simple directional sun light
+    vec3 sunDir = normalize(vec3(0.5, 1.0, 0.3));
+    float diff = max(dot(N, sunDir), 0.0);
+    vec3 finalColor = albedo * (0.15 + diff * 0.85);
+
+    outColor = vec4(finalColor, fragColor.a);
 }

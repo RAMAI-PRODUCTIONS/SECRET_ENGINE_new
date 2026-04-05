@@ -17,6 +17,9 @@ void LightingPlugin::OnLoad(SecretEngine::ICore* core) {
     // Register as lighting system capability
     m_core->RegisterCapability("lighting", this);
     
+    // Store 'this' pointer for verification
+    m_selfPointer = this;
+    
     if (m_core->GetLogger()) {
         m_core->GetLogger()->LogInfo("LightingSystem", "Plugin loaded");
         
@@ -43,8 +46,18 @@ void LightingPlugin::OnDeactivate() {
 }
 
 void LightingPlugin::OnUnload() {
-    if (m_core && m_core->GetLogger()) {
-        m_core->GetLogger()->LogInfo("LightingSystem", "Plugin unloaded");
+    // Only log once - if we're seeing this multiple times, something is wrong
+    static bool unloaded = false;
+    if (!unloaded) {
+        unloaded = true;
+        if (m_core && m_core->GetLogger()) {
+            m_core->GetLogger()->LogInfo("LightingSystem", "Plugin unloaded - THIS SHOULD ONLY APPEAR ONCE!");
+        }
+    }
+    // Clear the light manager to prevent dangling pointers
+    if (m_lightManager) {
+        delete m_lightManager;
+        m_lightManager = nullptr;
     }
 }
 
@@ -93,7 +106,31 @@ uint32_t LightingPlugin::GetLightCount() const {
 }
 
 std::span<const SecretEngine::LightData> LightingPlugin::GetLightBuffer() const {
-    return m_lightManager ? m_lightManager->GetLightBuffer() : std::span<const SecretEngine::LightData>{};
+    // Debug: Log internal state (only once)
+    static bool logged = false;
+    if (!logged && m_core && m_core->GetLogger()) {
+        logged = true;
+        char buf[256];
+        snprintf(buf, sizeof(buf), "GetLightBuffer: this=%p, m_selfPointer=%p, m_lightManager=%p", 
+                 (void*)this, m_selfPointer, (void*)m_lightManager);
+        m_core->GetLogger()->LogInfo("LightingSystem", buf);
+    }
+    
+    // Safety check: validate m_lightManager pointer
+    if (!m_lightManager) {
+        return std::span<const SecretEngine::LightData>{};
+    }
+    
+    // Get the buffer from the manager
+    auto buffer = m_lightManager->GetLightBuffer();
+    
+    // Sanity check: if the size is absurdly large, return empty span
+    // Max lights is 1024, so any count above that is clearly corruption
+    if (buffer.size() > 1024) {
+        return std::span<const SecretEngine::LightData>{};
+    }
+    
+    return buffer;
 }
 
 const void* LightingPlugin::GetLightBufferRaw() const {
@@ -149,7 +186,12 @@ extern "C" {
         return new LightingPlugin();
     }
     
+    SecretEngine::IPlugin* CreateLightingPlugin() {
+        return new LightingPlugin();
+    }
+    
     void DestroyPlugin(SecretEngine::IPlugin* plugin) {
         delete plugin;
     }
 }
+

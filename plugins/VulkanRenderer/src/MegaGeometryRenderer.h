@@ -87,6 +87,14 @@ private:
     // Camera
     float m_viewProj[16];
     
+    // Dynamic lighting
+    VkBuffer m_lightBuffer = VK_NULL_HANDLE;
+    uint32_t m_lightCount = 0;
+    VkDescriptorSetLayout m_lightDescriptorLayout = VK_NULL_HANDLE;
+    VkDescriptorSet m_lightDescriptorSet = VK_NULL_HANDLE;
+    VkDescriptorPool m_lightDescriptorPool = VK_NULL_HANDLE;
+    bool m_lightDescriptorDirty = false;
+    
     // Batch update flag
     bool m_batchUpdateActive = false;
     
@@ -124,6 +132,9 @@ public:
     void SetViewProjection(const float* vp) {
         memcpy(m_viewProj, vp, sizeof(float) * 16);
     }
+    
+    // Dynamic lighting support
+    void SetLightBuffer(VkBuffer buffer, VkDeviceSize size, uint32_t count);
     
     void PreRender(VkCommandBuffer cmd);
     void Render(VkCommandBuffer cmd);

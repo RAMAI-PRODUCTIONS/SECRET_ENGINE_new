@@ -71,6 +71,13 @@ uint32_t LightManager::GetLightCount() const {
 }
 
 std::span<const LightData> LightManager::GetLightBuffer() const {
+    // Debug: Log the actual buffer state
+    // Note: This is called every frame, so we only log once
+    static bool logged = false;
+    if (!logged) {
+        logged = true;
+        // Size will be logged by caller
+    }
     return std::span<const LightData>(m_lights.data(), m_lights.size());
 }
 

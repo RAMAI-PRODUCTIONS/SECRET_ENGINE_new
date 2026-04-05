@@ -21,6 +21,12 @@ public:
     void OnUnload() override;
     void OnUpdate(float deltaTime) override;
     
+    // GetInterface: id=3 returns ILightingSystem* (safe cross-cast for multiple inheritance)
+    void* GetInterface(uint32_t id) override {
+        if (id == 3) return static_cast<SecretEngine::ILightingSystem*>(this);
+        return nullptr;
+    }
+    
     // ILightingSystem interface - Basic light management
     uint32_t AddLight(const SecretEngine::LightData& light) override;
     void UpdateLight(uint32_t lightID, const SecretEngine::LightData& light) override;
@@ -45,6 +51,9 @@ public:
 private:
     SecretEngine::ICore* m_core = nullptr;
     SecretEngine::LightManager* m_lightManager = nullptr;
+    
+    // Debug: Store 'this' pointer for corruption detection
+    const void* m_selfPointer = nullptr;
 };
 
 extern "C" {

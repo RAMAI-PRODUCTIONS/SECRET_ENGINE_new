@@ -171,19 +171,14 @@ void MegaGeometryRenderer::Render(VkCommandBuffer cmd) {
     // 4. Draw
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-    // Bind instance buffer descriptor set (set = 0) and, if available, bindless texture set (set = 1)
-    VkDescriptorSet sets[2] = { m_descriptorSet[m_frameIndex], VK_NULL_HANDLE };
-    uint32_t setCount = 1;
-    if (m_textureManager) {
-        sets[1] = m_textureManager->GetTextureDescriptorSet();
-        setCount = 2;
-    }
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, setCount, sets, 0, nullptr);
+    // Bind descriptor sets: set 0 = instances only
+    VkDescriptorSet sets[1] = { m_descriptorSet[m_frameIndex] };
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, sets, 0, nullptr);
     
     if (m_vertexBuffer != VK_NULL_HANDLE) {
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &m_vertexBuffer, &offset);
-        vkCmdBindIndexBuffer(cmd, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16); // NITRO 16-BIT
+        vkCmdBindIndexBuffer(cmd, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
         vkCmdPushConstants(cmd, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, m_viewProj);
         vkCmdDrawIndexedIndirect(cmd, m_indirectBuffer[m_frameIndex], 0, 1, sizeof(VkDrawIndexedIndirectCommand));
     }
@@ -300,6 +295,7 @@ bool MegaGeometryRenderer::CreateIndirectBuffer() {
 bool MegaGeometryRenderer::CreateDescriptorSet() {
     auto logger = m_core ? m_core->GetLogger() : nullptr;
 
+    // Set 0: instance SSBO (vertex stage)
     VkDescriptorSetLayoutBinding binding = {};
     binding.binding = 0;
     binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -314,14 +310,32 @@ bool MegaGeometryRenderer::CreateDescriptorSet() {
         if (logger) logger->LogError("MegaGeometryRenderer", "Failed to create descriptor set layout for instance buffer");
         return false;
     }
-    
-    VkDescriptorPoolSize poolSize = {};
-    poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    poolSize.descriptorCount = 2;
+
+    // Set 2: light SSBO (fragment stage)
+    VkDescriptorSetLayoutBinding lightBinding = {};
+    lightBinding.binding = 0;
+    lightBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    lightBinding.descriptorCount = 1;
+    lightBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    VkDescriptorSetLayoutCreateInfo lightLayoutInfo = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+    lightLayoutInfo.bindingCount = 1;
+    lightLayoutInfo.pBindings = &lightBinding;
+    res = vkCreateDescriptorSetLayout(m_vkDevice, &lightLayoutInfo, nullptr, &m_lightDescriptorLayout);
+    if (res != VK_SUCCESS) {
+        if (logger) logger->LogError("MegaGeometryRenderer", "Failed to create light descriptor set layout");
+        return false;
+    }
+
+    // Pool for instance sets (2 frames) + 1 light set
+    VkDescriptorPoolSize poolSizes[1] = {};
+    poolSizes[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    poolSizes[0].descriptorCount = 3; // 2 instance + 1 light
+
     VkDescriptorPoolCreateInfo poolInfo = {VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
     poolInfo.poolSizeCount = 1;
-    poolInfo.pPoolSizes = &poolSize;
-    poolInfo.maxSets = 2;
+    poolInfo.pPoolSizes = poolSizes;
+    poolInfo.maxSets = 3;
     VkDescriptorPool pool = VK_NULL_HANDLE;
     res = vkCreateDescriptorPool(m_vkDevice, &poolInfo, nullptr, &pool);
     if (res != VK_SUCCESS) {
@@ -346,7 +360,40 @@ bool MegaGeometryRenderer::CreateDescriptorSet() {
         write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; write.pBufferInfo = &bInfo;
         vkUpdateDescriptorSets(m_vkDevice, 1, &write, 0, nullptr);
     }
+
+    // Allocate light descriptor set (will be updated when light buffer is set)
+    VkDescriptorSetAllocateInfo lightAllocInfo = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+    lightAllocInfo.descriptorPool = pool;
+    lightAllocInfo.descriptorSetCount = 1;
+    lightAllocInfo.pSetLayouts = &m_lightDescriptorLayout;
+    res = vkAllocateDescriptorSets(m_vkDevice, &lightAllocInfo, &m_lightDescriptorSet);
+    if (res != VK_SUCCESS) {
+        if (logger) logger->LogError("MegaGeometryRenderer", "Failed to allocate light descriptor set");
+        // Non-fatal: lighting will be disabled
+    }
+
+    m_lightDescriptorPool = pool;
     return true; 
+}
+
+void MegaGeometryRenderer::SetLightBuffer(VkBuffer buffer, VkDeviceSize size, uint32_t count) {
+    m_lightBuffer = buffer;
+    m_lightCount = count;
+
+    if (m_lightDescriptorSet == VK_NULL_HANDLE || buffer == VK_NULL_HANDLE) return;
+
+    VkDescriptorBufferInfo bufInfo = {};
+    bufInfo.buffer = buffer;
+    bufInfo.offset = 0;
+    bufInfo.range = size > 0 ? size : VK_WHOLE_SIZE;
+
+    VkWriteDescriptorSet write = {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    write.dstSet = m_lightDescriptorSet;
+    write.dstBinding = 0;
+    write.descriptorCount = 1;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    write.pBufferInfo = &bufInfo;
+    vkUpdateDescriptorSets(m_vkDevice, 1, &write, 0, nullptr);
 }
 
 bool MegaGeometryRenderer::CreatePipeline(VkRenderPass renderPass) {
@@ -418,14 +465,9 @@ bool MegaGeometryRenderer::CreatePipeline(VkRenderPass renderPass) {
     VkPushConstantRange push = {VK_SHADER_STAGE_VERTEX_BIT, 0, 64};
     VkPipelineLayoutCreateInfo pl = {VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
 
-    // Descriptor set 0: visible instance buffer (this renderer)
-    // Descriptor set 1: bindless texture array (TextureManager), when available
-    VkDescriptorSetLayout setLayouts[2] = { m_descriptorSetLayout, VK_NULL_HANDLE };
+    // set 0: instance SSBO only (no texture dependency - textures disabled on this device)
+    VkDescriptorSetLayout setLayouts[1] = { m_descriptorSetLayout };
     uint32_t setLayoutCount = 1;
-    if (m_textureManager) {
-        setLayouts[1] = m_textureManager->GetDescriptorSetLayout();
-        setLayoutCount = 2;
-    }
     pl.setLayoutCount = setLayoutCount;
     pl.pSetLayouts = setLayouts;
     pl.pushConstantRangeCount = 1;

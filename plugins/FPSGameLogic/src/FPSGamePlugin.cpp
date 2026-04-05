@@ -163,12 +163,16 @@ void FPSGamePlugin::CreateBotEntities(int count) {
 
 // Forward+ inspired: Create randomly moving lights to showcase the enhanced lighting system
 void FPSGamePlugin::CreateRandomMovingLights(int count) {
-    auto* lightingSystem = reinterpret_cast<SecretEngine::ILightingSystem*>(
-        m_core->GetCapability("lighting")
-    );
+    auto* lightingPlugin = m_core->GetCapability("lighting");
     
-    if (!lightingSystem) {
+    if (!lightingPlugin) {
         m_logger->LogError("FPSGameLogic", "LightingSystem not found! Cannot create lights.");
+        return;
+    }
+    
+    auto* lightingSystem = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
+    if (!lightingSystem) {
+        m_logger->LogError("FPSGameLogic", "LightingSystem GetInterface(3) failed!");
         return;
     }
     
@@ -236,10 +240,9 @@ void FPSGamePlugin::CreateRandomMovingLights(int count) {
 
 // Forward+ inspired: Update moving lights each frame
 void FPSGamePlugin::UpdateMovingLights(float deltaTime) {
-    auto* lightingSystem = reinterpret_cast<SecretEngine::ILightingSystem*>(
-        m_core->GetCapability("lighting")
-    );
-    
+    auto* lightingPlugin = m_core->GetCapability("lighting");
+    if (!lightingPlugin) return;
+    auto* lightingSystem = static_cast<SecretEngine::ILightingSystem*>(lightingPlugin->GetInterface(3));
     if (!lightingSystem) return;
     
     for (auto& light : m_movingLights) {

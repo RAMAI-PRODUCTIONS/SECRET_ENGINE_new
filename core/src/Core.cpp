@@ -13,6 +13,7 @@
 #include "Logger.h"
 #include "PluginManager.h"
 #include <map>
+#include <set>
 #include <string>
 
 #if defined(SE_PLATFORM_ANDROID)
@@ -26,6 +27,7 @@ extern "C" SecretEngine::IPlugin* CreateGameplayTagPlugin();
 extern "C" SecretEngine::IPlugin* CreateLevelSystemPlugin();
 extern "C" SecretEngine::IPlugin* CreateFPSGamePlugin();
 extern "C" SecretEngine::IPlugin* CreateFPSUIPlugin();
+extern "C" SecretEngine::IPlugin* CreateLightingPlugin();
 #endif
 
 #include <chrono>
@@ -101,6 +103,11 @@ namespace SecretEngine {
                 fpsUI->OnLoad(this);
             }
 
+            IPlugin* lighting = CreateLightingPlugin();
+            if (lighting) {
+                lighting->OnLoad(this);
+            }
+
             // Activate all loaded plugins
             for (auto const& [name, plugin] : m_capabilities) {
                 if (plugin) {
@@ -174,11 +181,27 @@ namespace SecretEngine {
         void RegisterCapability(const char* name, IPlugin* plugin) override {
             m_capabilities[name] = plugin;
             m_logger->LogInfo("Core", ("Registered Capability: " + std::string(name)).c_str());
+            
+            // Debug: Log the pointer being stored
+            char buf[128];
+            snprintf(buf, sizeof(buf), "  Pointer for '%s': %p", name, (void*)plugin);
+            m_logger->LogInfo("Core", buf);
         }
 
         IPlugin* GetCapability(const char* name) override {
             auto it = m_capabilities.find(name);
-            return (it != m_capabilities.end()) ? it->second : nullptr;
+            IPlugin* result = (it != m_capabilities.end()) ? it->second : nullptr;
+            
+            // Debug: Log the pointer being retrieved (only once per capability)
+            static std::set<std::string> logged;
+            if (logged.find(name) == logged.end() && m_logger) {
+                logged.insert(name);
+                char buf[128];
+                snprintf(buf, sizeof(buf), "GetCapability('%s') returning: %p", name, (void*)result);
+                m_logger->LogInfo("Core", buf);
+            }
+            
+            return result;
         }
 
     private:
